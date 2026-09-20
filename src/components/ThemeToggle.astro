@@ -1,0 +1,38 @@
+---
+---
+
+<button
+  class="theme-toggle"
+  type="button"
+  data-theme-toggle
+  aria-label="Switch between dark and light appearance"
+>
+  <span data-theme-toggle-label>Dark</span>
+</button>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const button = document.querySelector('[data-theme-toggle]');
+    const label = document.querySelector('[data-theme-toggle-label]');
+    if (!button || !label) return;
+
+    const render = () => {
+      const isLight = root.dataset.theme === 'light';
+      label.textContent = isLight ? 'Light' : 'Dark';
+      button.setAttribute('aria-pressed', String(isLight));
+    };
+
+    button.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('theme', root.dataset.theme);
+      } catch {
+        // Private mode / blocked storage: the toggle still works for this page view.
+      }
+      render();
+    });
+
+    render();
+  })();
+</script>

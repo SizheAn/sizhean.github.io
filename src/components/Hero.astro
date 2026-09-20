@@ -1,0 +1,41 @@
+---
+import { profile } from '../data/profile';
+
+const { positioning, scholarBadge } = profile;
+---
+
+<section class="hero" id="top">
+  <div class="hero__copy">
+    <p class="eyebrow">{profile.role} · {profile.affiliation} · {profile.location}</p>
+    <h1>{profile.name}</h1>
+    <p class="hero__lead">{positioning.lead}</p>
+    <p class="hero__statement">{positioning.statement}</p>
+    <p class="hero__foundation">{positioning.foundation}</p>
+
+    <div class="link-row" aria-label="Profile links">
+      {
+        profile.links.map((link) =>
+          link.pending ? (
+            <span class="chip chip--pending" title={link.note}>
+              {link.label}
+              <em>soon</em>
+            </span>
+          ) : (
+            <a class="chip" href={link.href}>
+              {link.label}
+            </a>
+          ),
+        )
+      }
+    </div>
+
+    <a class="scholar-badge" href={scholarBadge.href} data-scholar-citations>
+      <span>{scholarBadge.label}</span>
+      <strong>—</strong>
+    </a>
+  </div>
+
+  <figure class="hero__portrait">
+    <img src={profile.portrait} alt={profile.portraitAlt} width="480" height="480" />
+  </figure>
+</section>

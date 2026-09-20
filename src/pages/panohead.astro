@@ -1,0 +1,27 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PublicationCard from '../components/PublicationCard.astro';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import { publications } from '../data/publications';
+
+const publication = publications.find((item) => item.slug === 'panohead');
+if (!publication) {
+  throw new Error('PanoHead publication data missing');
+}
+---
+
+<BaseLayout title="PanoHead — Sizhe An" description={publication.summary}>
+  <header class="topbar topbar--simple">
+    <a href="/" class="wordmark">Sizhe An</a>
+    <nav aria-label="Project navigation">
+      <a href="/">Home</a>
+      <a href="/mri/">mRI</a>
+      <ThemeToggle />
+    </nav>
+  </header>
+  <main class="project-page">
+    <p class="eyebrow">Legacy project preserved in the new portfolio</p>
+    <h1>{publication.title}</h1>
+    <PublicationCard publication={publication} />
+  </main>
+</BaseLayout>

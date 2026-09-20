@@ -1,0 +1,15 @@
+---
+import type { FocusArea } from '../data/profile';
+
+interface Props extends FocusArea {
+  index: number;
+}
+
+const { label, description, index } = Astro.props;
+---
+
+<article class="focus-card">
+  <span class="focus-card__index">{String(index + 1).padStart(2, '0')}</span>
+  <h3>{label}</h3>
+  <p>{description}</p>
+</article>
