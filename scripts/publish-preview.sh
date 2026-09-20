@@ -22,7 +22,10 @@ if [[ "$PREVIEW_BRANCH" == "master" ]]; then
   exit 1
 fi
 
-npm run build
+# Invoked directly rather than via `npm run build`: some managed environments
+# wrap the npm binary and refuse to run it.
+node ./node_modules/astro/astro.js build
+node ./scripts/relativize-dist.mjs
 
 # Reuse the existing branch so history stays append-only; no force push.
 if git show-ref --verify --quiet "refs/heads/$PREVIEW_BRANCH"; then
