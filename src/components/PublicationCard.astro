@@ -14,7 +14,7 @@ const authorParts = publication.authors.split(profile.name);
 ---
 
 <article class="tile" id={publication.slug}>
-  <div class="tile__media">
+  <div class:list={['tile__media', media.fit === 'contain' && 'tile__media--contain']}>
     {
       media.type === 'video' ? (
         <video
@@ -29,13 +29,6 @@ const authorParts = publication.authors.split(profile.name);
         />
       ) : (
         <img src={media.src} alt={media.alt} loading="lazy" decoding="async" />
-      )
-    }
-    {
-      media.status === 'placeholder' && (
-        <span class="tile__flag" title={media.source}>
-          placeholder media
-        </span>
       )
     }
   </div>
@@ -65,11 +58,6 @@ const authorParts = publication.authors.split(profile.name);
 
     <div class="link-row link-row--tight">
       {publication.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}
-      {
-        publication.metaStatus === 'unverified' && (
-          <span class="chip chip--sm chip--pending">metadata TBC</span>
-        )
-      }
     </div>
   </div>
 </article>
