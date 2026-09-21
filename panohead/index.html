@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.18.2"><meta name="description" content="A geometry-aware generative model for complete 3D full-head synthesis across 360-degree viewpoints."><meta property="og:title" content="PanoHead — Sizhe An"><meta property="og:description" content="A geometry-aware generative model for complete 3D full-head synthesis across 360-degree viewpoints."><meta property="og:type" content="website"><meta property="og:url" content="https://sizhean.github.io/"><meta property="og:image" content="https://sizhean.github.io/assets/og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0a0b0d"><link rel="icon" href="../favicon.svg" type="image/svg+xml"><title>PanoHead — Sizhe An</title><script>
+      // Runs before paint so a stored light preference doesn't flash dark first.
+      try {
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+        }
+      } catch {}
+    </script><link rel="stylesheet" href="../_astro/index.1TMWcaLz.css"></head> <body> <div class="site-shell">  <header class="topbar topbar--simple"> <a href="../" class="wordmark">Sizhe An</a> <nav aria-label="Project navigation"> <a href="../">Home</a> <a href="../mri/">mRI</a> <button class="theme-toggle" type="button" data-theme-toggle> <span data-theme-toggle-label>Dark</span> </button> <script>
+  (() => {
+    const root = document.documentElement;
+    const button = document.querySelector('[data-theme-toggle]');
+    const label = document.querySelector('[data-theme-toggle-label]');
+    if (!button || !label) return;
+
+    const render = () => {
+      // Label the action, not the state: "Dark" while in dark mode reads as both.
+      const isLight = root.dataset.theme === 'light';
+      label.textContent = isLight ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to ${isLight ? 'dark' : 'light'} appearance`);
+      button.setAttribute('aria-pressed', String(isLight));
+    };
+
+    button.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('theme', root.dataset.theme);
+      } catch {
+        // Private mode / blocked storage: the toggle still works for this page view.
+      }
+      render();
+    });
+
+    render();
+  })();
+</script> </nav> </header> <main class="project-page"> <p class="eyebrow">CVPR 2023</p> <h1>PanoHead: Geometry-Aware 3D Full-Head Synthesis in 360°</h1> <article class="tile" id="panohead"> <div class="tile__media"> <video src="../assets/panohead.mp4" poster="../assets/panohead.jpg" playsinline muted loop preload="none" aria-label="PanoHead 360-degree full-head synthesis overview" data-autoplay></video> </div> <div class="tile__body"> <div class="tile__meta"> <span class="pill pill--refereed"> CVPR 2023 </span> <span class="role role--strong">First author</span> </div> <h3> <a href="../panohead/">PanoHead: Geometry-Aware 3D Full-Head Synthesis in 360°</a> </h3> <p class="tile__authors" title="Sizhe An, Hongyi Xu, Yichun Shi, Guoxian Song, Umit Ogras, Linjie Luo"> <strong>Sizhe An</strong>, …, Linjie Luo </p> <p class="tile__contribution">The first 3D-aware GAN to synthesize a full head rather than a frontal face — back of the skull and hair included.</p> <div class="link-row link-row--tight"> <a class="chip chip--sm" href="../panohead/">Project</a><a class="chip chip--sm" href="https://arxiv.org/abs/2303.13071">Paper</a><a class="chip chip--sm" href="https://github.com/sizhean/panohead">Code</a> </div> </div> </article> </main>  </div> <script>
+      // Clips carry no autoplay attribute: they start only once on screen, and
+      // never when the visitor has asked for reduced motion. Poster frames mean
+      // the tiles still read correctly if this never runs.
+      (() => {
+        const clips = document.querySelectorAll('video[data-autoplay]');
+        if (!clips.length) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!('IntersectionObserver' in window)) {
+          clips.forEach((clip) => clip.play().catch(() => {}));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.play().catch(() => {});
+              } else {
+                entry.target.pause();
+              }
+            }
+          },
+          { rootMargin: '250px 0px' },
+        );
+
+        clips.forEach((clip) => observer.observe(clip));
+      })();
+    </script> </body> </html>
