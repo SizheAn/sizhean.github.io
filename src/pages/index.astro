@@ -1,52 +1,82 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import FocusCard from '../components/FocusCard.astro';
-import Hero from '../components/Hero.astro';
-import PublicationCard from '../components/PublicationCard.astro';
+import EvidenceBlock from '../components/EvidenceBlock.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import { profile } from '../data/profile';
-import { featuredWork, otherPublications } from '../data/publications';
+import { publications, venueTally } from '../data/publications';
+import { thesis } from '../data/thesis';
+
+const bySlug = (slug: string) => publications.find((p) => p.slug === slug)!;
+const cited = new Set(thesis.acts.flatMap((act) => act.evidence));
+const remainder = publications.filter((publication) => !cited.has(publication.slug));
+const venues = venueTally();
+const years = new Date().getFullYear() - profile.since.year;
 ---
 
 <BaseLayout>
-  <header class="topbar">
+  <header class="topbar topbar--film">
     <a href="#top" class="wordmark">{profile.name}</a>
     <nav aria-label="Site navigation">
+      {thesis.acts.map((act) => <a href={`#${act.id}`}>{act.numeral}. {act.title}</a>)}
       <a href="#about">About</a>
-      <a href="#focus">Focus</a>
-      <a href="#work">Work</a>
-      <a href={`mailto:${profile.email}`}>Contact</a>
       <ThemeToggle />
     </nav>
   </header>
 
   <main>
-    <Hero />
-
-    <section class="section section--bio" id="about" aria-labelledby="about-heading">
-      <h2 class="section__label" id="about-heading">About</h2>
-      <p>{profile.biography}</p>
-    </section>
-
-    <section class="section" id="focus" aria-labelledby="focus-heading">
-      <h2 class="section__label" id="focus-heading">Current focus</h2>
-      <div class="focus-grid">
-        {profile.currentFocus.map((area, index) => <FocusCard {...area} index={index} />)}
+    <section class="film" id="top">
+      <video
+        class="film__media"
+        src="/assets/humanclaw.mp4"
+        poster="/assets/humanclaw.jpg"
+        playsinline
+        muted
+        loop
+        preload="none"
+        aria-label="A vision-language model acting through a human body in a simulated house"
+        data-autoplay
+      />
+      <div class="film__scrim"></div>
+      <div class="film__copy">
+        <p class="eyebrow">{profile.name} · {profile.role} · {profile.affiliation}</p>
+        <h1>{thesis.statement}</h1>
+        <p class="film__standfirst">{thesis.standfirst}</p>
+        <ul class="metrics metrics--film" aria-label="Publication record">
+          {venues.map((venue) => <li>{venue.label}{venue.count > 1 && ` ×${venue.count}`}</li>)}
+          <li><a href={profile.github.repo}>{profile.github.label} ★{profile.github.stars.toLocaleString('en-US')}</a></li>
+          <li>{years} yrs @ {profile.since.label}</li>
+        </ul>
+        <div class="link-row">
+          {profile.links.map((link) => <a class="chip" href={link.href}>{link.label}</a>)}
+        </div>
       </div>
     </section>
 
-    <section class="section" id="work" aria-labelledby="work-heading">
-      <h2 class="section__label" id="work-heading">Selected work</h2>
-      <div class="work-grid">
-        {featuredWork.map((publication) => <PublicationCard publication={publication} />)}
-      </div>
-    </section>
+    {
+      thesis.acts.map((act) => (
+        <section class="act" id={act.id} aria-labelledby={`${act.id}-heading`}>
+          <div class="act__head">
+            <p class="act__numeral">{act.numeral}</p>
+            <div>
+              <h2 id={`${act.id}-heading`}>{act.claim}</h2>
+              <p class="act__argument">{act.argument}</p>
+              {act.internalNote && <p class="act__internal">{act.internalNote}</p>}
+            </div>
+          </div>
+          <div class="act__evidence">
+            {act.evidence.map((slug, index) => (
+              <EvidenceBlock publication={bySlug(slug)} index={index} />
+            ))}
+          </div>
+        </section>
+      ))
+    }
 
-    <section class="section" id="earlier" aria-labelledby="earlier-heading">
-      <h2 class="section__label" id="earlier-heading">Earlier work</h2>
+    <section class="section" id="more" aria-labelledby="more-heading">
+      <h2 class="section__label" id="more-heading">Also published</h2>
       <ul class="pub-list">
         {
-          otherPublications.map((publication) => (
+          remainder.map((publication) => (
             <li>
               <span class="pill">{publication.venue} {publication.year}</span>
               <div>
@@ -55,9 +85,7 @@ import { featuredWork, otherPublications } from '../data/publications';
               </div>
               <div class="link-row link-row--tight">
                 {publication.links.map((link) => (
-                  <a class="chip chip--sm" href={link.href}>
-                    {link.label}
-                  </a>
+                  <a class="chip chip--sm" href={link.href}>{link.label}</a>
                 ))}
               </div>
             </li>
@@ -65,18 +93,17 @@ import { featuredWork, otherPublications } from '../data/publications';
         }
       </ul>
     </section>
+
+    <section class="section section--bio" id="about" aria-labelledby="about-heading">
+      <h2 class="section__label" id="about-heading">About</h2>
+      <p>{profile.biography}</p>
+    </section>
   </main>
 
   <footer class="footer">
     <p>{profile.name} · {profile.affiliation} · {profile.location}</p>
     <div class="link-row link-row--tight">
-      {
-        profile.links.map((link) => (
-          <a class="chip chip--sm" href={link.href}>
-            {link.label}
-          </a>
-        ))
-      }
+      {profile.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}
     </div>
   </footer>
 </BaseLayout>

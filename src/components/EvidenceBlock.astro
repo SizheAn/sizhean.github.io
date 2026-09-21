@@ -1,0 +1,65 @@
+---
+import { AUTHOR_NAME, authorRole, isPeerReviewed, shortAuthors } from '../data/publications';
+import type { Publication } from '../data/publications';
+
+interface Props {
+  publication: Publication;
+  index: number;
+}
+
+const { publication, index } = Astro.props;
+const { media } = publication;
+const role = authorRole(publication);
+const refereed = isPeerReviewed(publication);
+const authorParts = shortAuthors(publication.authors, 4).split(AUTHOR_NAME);
+const href = publication.links[0]?.href;
+---
+
+<article class:list={['evidence', index % 2 === 1 && 'evidence--flip']} id={publication.slug}>
+  <div class="evidence__media">
+    {
+      media.type === 'video' ? (
+        <video
+          src={media.src}
+          poster={media.poster}
+          playsinline
+          muted
+          loop
+          preload="none"
+          aria-label={media.alt}
+          data-autoplay
+        />
+      ) : (
+        <img src={media.src} alt={media.alt} loading="lazy" decoding="async" />
+      )
+    }
+  </div>
+
+  <div class="evidence__body">
+    <div class="evidence__meta">
+      <span class:list={['pill', refereed ? 'pill--refereed' : 'pill--preprint']}>
+        {publication.venue} {publication.year}
+      </span>
+      <span class:list={['role', role.strong && 'role--strong']}>{role.label}</span>
+    </div>
+
+    <h3>{href ? <a href={href}>{publication.title}</a> : publication.title}</h3>
+
+    <p class="evidence__authors" title={publication.authors}>
+      {
+        authorParts.map((part, i) => (
+          <>
+            {i > 0 && <strong>{AUTHOR_NAME}</strong>}
+            {part}
+          </>
+        ))
+      }
+    </p>
+
+    <p class="evidence__contribution">{publication.contribution}</p>
+
+    <div class="link-row link-row--tight">
+      {publication.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}
+    </div>
+  </div>
+</article>
