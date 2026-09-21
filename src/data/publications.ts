@@ -1,5 +1,7 @@
 // Every title, author list, venue, year and arXiv id below was checked against
-// the arXiv API (au:"Sizhe_An") and each paper's own project page on 2026-09-20.
+// the arXiv API and each paper's own project page on 2026-09-20. Both author
+// spellings are searched — au:"Sizhe_An" and au:"Size_An", since IAM is indexed
+// under the misspelling and is invisible to the first query.
 // Teaser media comes from each paper's own project page — never another paper's.
 
 export type Media = {
@@ -62,6 +64,32 @@ export const publications: Publication[] = [
     featuredOrder: 1,
   },
   {
+    slug: 'show3d',
+    shortTitle: 'SHOW3D',
+    title: 'SHOW3D: Capturing Scenes of 3D Hands and Objects in the Wild',
+    authors:
+      'Patrick Rim, Kevin Harris, Braden Copple, Shangchen Han, Xu Xie, Ivan Shugurov, Sizhe An, He Wen, Alex Wong, Tomas Hodan, Kun He',
+    venue: 'CVPR',
+    year: '2026',
+    theme: 'Hand-object interaction capture',
+    summary:
+      'A mobile multi-camera rig and ego-exo annotation pipeline that captures 3D hands and objects outside the lab.',
+    contribution:
+      'Dexterous manipulation needs contact-rich data from real environments, not a capture dome — this is the rig and the pipeline that produce it.',
+    tags: ['Hands', 'Manipulation', 'Dataset', 'Egocentric'],
+    media: {
+      type: 'image',
+      src: '/assets/show3d.jpg',
+      alt: 'SHOW3D teaser: egocentric views of hands manipulating everyday objects with 3D hand meshes overlaid',
+      source: 'https://show3d-dataset.github.io/figures/Figure_Main_v4.png',
+    },
+    links: [
+      { label: 'Project', href: 'https://show3d-dataset.github.io/' },
+      { label: 'Paper', href: 'https://arxiv.org/abs/2603.28760' },
+    ],
+    featuredOrder: 2,
+  },
+  {
     slug: 'ms-forcing',
     shortTitle: 'Ms. Forcing',
     title:
@@ -84,7 +112,7 @@ export const publications: Publication[] = [
       fit: 'contain',
     },
     links: [{ label: 'Paper', href: 'https://arxiv.org/abs/2607.20940' }],
-    featuredOrder: 2,
+    featuredOrder: 3,
   },
   {
     slug: 'umo',
@@ -112,7 +140,34 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2603.15975' },
       { label: 'Code', href: 'https://github.com/Oliver-Cong02/UMO' },
     ],
-    featuredOrder: 3,
+    featuredOrder: 4,
+  },
+  {
+    slug: 'iam',
+    shortTitle: 'IAM',
+    title: 'IAM: Identity-Aware Human Motion and Shape Joint Generation',
+    // arXiv lists the last author as "Size An" — a typo for Sizhe An. Corrected here.
+    authors:
+      'Wenqi Jia, Zekun Li, Abhay Mittal, Chengcheng Tang, Chuan Guo, Lezi Wang, James Matthew Rehg, Lingling Tao, Sizhe An',
+    venue: 'arXiv',
+    year: '2026',
+    theme: 'Identity-conditioned motion',
+    summary:
+      'Joint generation of human motion and body shape, so a described identity and the motion it produces stay consistent.',
+    contribution:
+      'Body morphology changes how a motion actually looks — generating shape and motion together keeps the two from contradicting each other.',
+    tags: ['Motion generation', 'Body shape', 'Identity', 'Multimodal'],
+    media: {
+      type: 'image',
+      src: '/assets/iam.jpg',
+      alt: 'IAM teaser: the same motion prompts rendered across different body identities',
+      source: 'https://vjwq.github.io/IAM/static/images/teaser.png',
+    },
+    links: [
+      { label: 'Project', href: 'https://vjwq.github.io/IAM/' },
+      { label: 'Paper', href: 'https://arxiv.org/abs/2604.25164' },
+    ],
+    featuredOrder: 5,
   },
   {
     slug: 'llamo',
@@ -141,7 +196,34 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2602.12370' },
       { label: 'CVPR', href: 'https://cvpr.thecvf.com/virtual/2026/poster/38091' },
     ],
-    featuredOrder: 4,
+    featuredOrder: 6,
+  },
+  {
+    slug: 'phd',
+    shortTitle: 'PHD',
+    title: 'PHD: Personalized 3D Human Body Fitting with Point Diffusion',
+    authors:
+      'Hsuan-I Ho, Chen Guo, Po-Chen Wu, Ivan Shugurov, Chengcheng Tang, Abhay Mittal, Sizhe An, Manuel Kaufmann, Linguang Zhang',
+    venue: 'ICCV',
+    year: '2025',
+    theme: 'Personalized body fitting',
+    summary:
+      'Fits a 3D body to images using a point-diffusion prior conditioned on the subject’s own scanned shape.',
+    contribution:
+      'Knowing whose body it is turns fitting from a guess about shape into a pose problem, which is where the accuracy comes from.',
+    tags: ['3D human body', 'Diffusion', 'Pose estimation', 'Personalization'],
+    media: {
+      type: 'video',
+      src: '/assets/phd.mp4',
+      poster: '/assets/phd.jpg',
+      alt: 'PHD body fitting compared against ScoreHMR on in-the-wild video',
+      source: 'https://phd-pose.github.io/videos/result1.mp4 (0–12s)',
+    },
+    links: [
+      { label: 'Project', href: 'https://phd-pose.github.io/' },
+      { label: 'Paper', href: 'https://arxiv.org/abs/2508.21257' },
+    ],
+    featuredOrder: 7,
   },
   {
     slug: 'panohead',
@@ -168,7 +250,7 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2303.13071' },
       { label: 'Code', href: 'https://github.com/sizhean/panohead' },
     ],
-    featuredOrder: 5,
+    featuredOrder: 8,
   },
   {
     slug: 'spherehead',
@@ -195,7 +277,7 @@ export const publications: Publication[] = [
       { label: 'Project', href: 'https://lhyfst.github.io/spherehead/' },
       { label: 'Paper', href: 'https://arxiv.org/abs/2404.05680' },
     ],
-    featuredOrder: 6,
+    featuredOrder: 9,
   },
   {
     slug: 'mri',

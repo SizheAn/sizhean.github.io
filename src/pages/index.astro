@@ -12,9 +12,9 @@ import { featuredWork, otherPublications } from '../data/publications';
   <header class="topbar">
     <a href="#top" class="wordmark">{profile.name}</a>
     <nav aria-label="Site navigation">
+      <a href="#about">About</a>
       <a href="#focus">Focus</a>
       <a href="#work">Work</a>
-      <a href="#more">Publications</a>
       <a href={`mailto:${profile.email}`}>Contact</a>
       <ThemeToggle />
     </nav>
@@ -23,31 +23,27 @@ import { featuredWork, otherPublications } from '../data/publications';
   <main>
     <Hero />
 
+    <section class="section section--bio" id="about" aria-labelledby="about-heading">
+      <h2 class="section__label" id="about-heading">About</h2>
+      <p>{profile.biography}</p>
+    </section>
+
     <section class="section" id="focus" aria-labelledby="focus-heading">
-      <div class="section__header">
-        <p class="section__kicker">Current Focus</p>
-        <h2 id="focus-heading">Research directions I am working on now.</h2>
-      </div>
+      <h2 class="section__label" id="focus-heading">Current focus</h2>
       <div class="focus-grid">
         {profile.currentFocus.map((area, index) => <FocusCard {...area} index={index} />)}
       </div>
     </section>
 
     <section class="section" id="work" aria-labelledby="work-heading">
-      <div class="section__header">
-        <p class="section__kicker">Selected Work</p>
-        <h2 id="work-heading">Ordered by how close it sits to a body that acts.</h2>
-      </div>
+      <h2 class="section__label" id="work-heading">Selected work</h2>
       <div class="work-grid">
         {featuredWork.map((publication) => <PublicationCard publication={publication} />)}
       </div>
     </section>
 
-    <section class="section" id="more" aria-labelledby="more-heading">
-      <div class="section__header">
-        <p class="section__kicker">Also</p>
-        <h2 id="more-heading">Earlier public work.</h2>
-      </div>
+    <section class="section" id="earlier" aria-labelledby="earlier-heading">
+      <h2 class="section__label" id="earlier-heading">Earlier work</h2>
       <ul class="pub-list">
         {
           otherPublications.map((publication) => (
@@ -68,11 +64,6 @@ import { featuredWork, otherPublications } from '../data/publications';
           ))
         }
       </ul>
-    </section>
-
-    <section class="section section--bio" aria-labelledby="bio-heading">
-      <p class="section__kicker" id="bio-heading">About</p>
-      <p>{profile.biography}</p>
     </section>
   </main>
 

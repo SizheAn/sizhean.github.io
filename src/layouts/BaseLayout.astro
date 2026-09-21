@@ -42,5 +42,35 @@ const {
     <div class="site-shell">
       <slot />
     </div>
+
+    <script is:inline>
+      // Clips carry no autoplay attribute: they start only once on screen, and
+      // never when the visitor has asked for reduced motion. Poster frames mean
+      // the tiles still read correctly if this never runs.
+      (() => {
+        const clips = document.querySelectorAll('video[data-autoplay]');
+        if (!clips.length) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!('IntersectionObserver' in window)) {
+          clips.forEach((clip) => clip.play().catch(() => {}));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.play().catch(() => {});
+              } else {
+                entry.target.pause();
+              }
+            }
+          },
+          { rootMargin: '250px 0px' },
+        );
+
+        clips.forEach((clip) => observer.observe(clip));
+      })();
+    </script>
   </body>
 </html>

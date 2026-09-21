@@ -29,10 +29,14 @@ const { positioning, scholarBadge } = profile;
       }
     </div>
 
-    <a class="scholar-badge" href={scholarBadge.href} data-scholar-citations>
-      <span>{scholarBadge.label}</span>
-      <strong>—</strong>
-    </a>
+    {
+      scholarBadge.count !== undefined && (
+        <a class="scholar-badge" href={scholarBadge.href}>
+          <span>{scholarBadge.label}</span>
+          <strong>{scholarBadge.count.toLocaleString('en-US')}</strong>
+        </a>
+      )
+    }
   </div>
 
   <figure class="hero__portrait">

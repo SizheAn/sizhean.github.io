@@ -80,6 +80,12 @@ h3 {
   letter-spacing: -0.02em;
 }
 
+/* Keeps single-word orphans off the last line of body copy. */
+p,
+li {
+  text-wrap: pretty;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
@@ -88,7 +94,7 @@ h3 {
 /* ---------- shared atoms ---------- */
 
 .eyebrow,
-.section__kicker {
+.section__label {
   margin: 0 0 14px;
   color: var(--muted);
   font-family: var(--mono);
@@ -96,6 +102,13 @@ h3 {
   font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+/* Sections are titled by a small label, not a sentence. */
+.section__label {
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
 }
 
 .chip {
@@ -240,25 +253,30 @@ h1 {
   letter-spacing: -0.035em;
 }
 
+/* No max-width: the phrase is short and must not be forced onto two lines.
+   It still wraps naturally on narrow screens. */
 .hero__lead {
-  max-width: 20ch;
   margin-bottom: 16px;
   color: var(--accent);
-  font-size: clamp(1.5rem, 3.4vw, 2.15rem);
+  font-size: clamp(1.35rem, 3.2vw, 2.05rem);
   font-weight: 600;
   line-height: 1.18;
   letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
+/* Balanced so the two lines break at the comma rather than through
+   "large-scale". */
 .hero__statement {
   max-width: 58ch;
   margin-bottom: 14px;
   font-size: 1.1rem;
   line-height: 1.6;
+  text-wrap: balance;
 }
 
 .hero__foundation {
-  max-width: 58ch;
+  max-width: 72ch;
   margin-bottom: 30px;
   padding-left: 14px;
   border-left: 2px solid var(--line-strong);
@@ -316,29 +334,11 @@ h1 {
   scroll-margin-top: 78px;
 }
 
-.section__header {
-  max-width: 58ch;
-  margin-bottom: 36px;
-}
-
-.section__header h2 {
-  margin: 0;
-  font-size: clamp(1.6rem, 3.2vw, 2.25rem);
-  line-height: 1.15;
-}
-
-.section--bio {
-  display: grid;
-  grid-template-columns: 140px minmax(0, 1fr);
-  gap: 32px;
-  padding-top: 44px;
-  border-top: 1px solid var(--line);
-}
-
-.section--bio p:last-child {
-  max-width: 70ch;
+.section--bio p {
+  max-width: 68ch;
   margin: 0;
   color: var(--muted);
+  font-size: 1.05rem;
 }
 
 /* ---------- current focus ---------- */
@@ -564,11 +564,6 @@ h1 {
   .focus-grid,
   .work-grid {
     grid-template-columns: 1fr;
-  }
-
-  .section--bio {
-    grid-template-columns: 1fr;
-    gap: 12px;
   }
 
   .pub-list li {

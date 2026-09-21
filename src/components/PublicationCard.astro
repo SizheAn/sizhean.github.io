@@ -23,9 +23,9 @@ const authorParts = publication.authors.split(profile.name);
           playsinline
           muted
           loop
-          autoplay
-          preload="metadata"
+          preload="none"
           aria-label={media.alt}
+          data-autoplay
         />
       ) : (
         <img src={media.src} alt={media.alt} loading="lazy" decoding="async" />

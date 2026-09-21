@@ -44,22 +44,17 @@ export const profile = {
       pending: true,
       note: 'Drop cv.pdf into public/assets/ to activate.',
     },
-    {
-      label: 'X',
-      href: '#',
-      pending: true,
-      note: 'Handle not yet supplied.',
-    },
     { label: 'Email', href: 'mailto:sizhe.an@wisc.edu' },
   ] satisfies ProfileLink[],
 
   /**
-   * Placeholder only. The count is deliberately absent — it gets filled in from
-   * a Scholar badge/fetch later, so a stale guessed number can't ship.
+   * The badge only renders once `count` is set — an empty one reads as broken.
+   * Fill it in from the real Scholar page; never guess the number.
    */
   scholarBadge: {
-    label: 'Google Scholar citations',
+    label: 'Citations',
     href: 'https://scholar.google.com/citations?user=l0XPLQcAAAAJ&hl=en',
+    count: undefined as number | undefined,
   },
 
   /**
@@ -70,7 +65,7 @@ export const profile = {
     {
       label: 'Robotics data pipeline & infrastructure',
       description:
-        'Collecting, curating, and serving robot learning data at scale — teleoperation, human video, and simulation — so heterogeneous demonstrations become something a policy can actually train on.',
+        'Collecting, curating, and serving robot-learning data at scale — teleoperation, human video, simulation — so heterogeneous demonstrations become something a policy can train on.',
     },
     {
       label: 'VLA & world-action models',
