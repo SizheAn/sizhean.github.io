@@ -1,0 +1,116 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.18.2"><meta name="description" content="Embodied AI &#38; robot learning — VLA, world-action models, dexterous manipulation, powered by large-scale robotics data &#38; infra. Built on a foundation of multi-modal motion generation and 3D humans."><meta property="og:title" content="Sizhe An — Embodied AI &#38; Robot Learning"><meta property="og:description" content="Embodied AI &#38; robot learning — VLA, world-action models, dexterous manipulation, powered by large-scale robotics data &#38; infra. Built on a foundation of multi-modal motion generation and 3D humans."><meta property="og:type" content="website"><meta property="og:url" content="https://sizhean.github.io/"><meta property="og:image" content="https://sizhean.github.io/assets/og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0a0b0d"><link rel="icon" href="./favicon.svg" type="image/svg+xml"><title>Sizhe An — Embodied AI &amp; Robot Learning</title><script>
+      // Runs before paint so a stored light preference doesn't flash dark first.
+      try {
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+        }
+      } catch {}
+    </script><link rel="stylesheet" href="./_astro/index.BhV73KoB.css"></head> <body> <div class="site-shell">  <div class="wall-layout"> <aside class="rail" id="top"> <div class="rail__inner"> <div class="rail__head"> <p class="wordmark">Sizhe An</p> <button class="theme-toggle" type="button" data-theme-toggle> <span data-theme-toggle-label>Dark</span> </button> <script>
+  (() => {
+    const root = document.documentElement;
+    const button = document.querySelector('[data-theme-toggle]');
+    const label = document.querySelector('[data-theme-toggle-label]');
+    if (!button || !label) return;
+
+    const render = () => {
+      // Label the action, not the state: "Dark" while in dark mode reads as both.
+      const isLight = root.dataset.theme === 'light';
+      label.textContent = isLight ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to ${isLight ? 'dark' : 'light'} appearance`);
+      button.setAttribute('aria-pressed', String(isLight));
+    };
+
+    button.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('theme', root.dataset.theme);
+      } catch {
+        // Private mode / blocked storage: the toggle still works for this page view.
+      }
+      render();
+    });
+
+    render();
+  })();
+</script> </div> <p class="eyebrow">Research Scientist · Meta · Redmond, WA</p> <p class="rail__lead">Embodied AI &amp; robot learning</p> <p class="rail__statement">VLA, world-action models, dexterous manipulation, powered by large-scale robotics data &amp; infra.</p> <p class="rail__bridge">The robot learning work at Meta is internal and not publishable. What is public is the layer underneath it: the data, the motion and shape representations, and the 3D-human models that embodied policies are built on.</p> <ul class="rail__metrics" aria-label="Publication record"> <li>CVPR ×4</li><li>ECCV Oral</li><li>ICCV</li><li>NeurIPS Datasets &amp; Benchmarks</li> <li><a href="https://github.com/SizheAn/PanoHead">PanoHead ★1,958</a></li> <li>3 yrs @ Meta</li> </ul> <div class="link-row link-row--tight"> <a class="chip chip--sm" href="https://scholar.google.com/citations?user=l0XPLQcAAAAJ&hl=en">Scholar</a><a class="chip chip--sm" href="https://github.com/SizheAn">GitHub</a><a class="chip chip--sm" href="mailto:sizhe.an@wisc.edu">Email</a> </div> <h2 class="rail__label">Now</h2> <ul class="rail__now"> <li> <span>Jul 2026</span> <a href="#humanclaw">HumanCLAW</a> <em>preprint</em> </li><li> <span>Jul 2026</span> <a href="#ms-forcing">Ms. Forcing</a> <em>preprint</em> </li><li> <span>Apr 2026</span> <a href="#iam">IAM</a> <em>preprint</em> </li><li> <span>Mar 2026</span> <a href="#show3d">SHOW3D</a> <em>CVPR</em> </li> </ul> </div> </aside> <main class="wall" aria-label="Results"> <button class="cell cell--wide" type="button" id="humanclaw" data-slug="humanclaw" aria-haspopup="dialog"> <video src="./assets/humanclaw.mp4" poster="./assets/humanclaw.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--preprint"> arXiv 2026 </span> <span class="cell__name">HumanCLAW</span> </span> </button><button class="cell" type="button" id="show3d" data-slug="show3d" aria-haspopup="dialog"> <img src="./assets/show3d.jpg" alt="" loading="lazy" decoding="async"> <span class="cell__bar"> <span class="pill pill--refereed"> CVPR 2026 </span> <span class="cell__name">SHOW3D</span> </span> </button><button class="cell" type="button" id="mri" data-slug="mri" aria-haspopup="dialog"> <video src="./assets/mri.mp4" poster="./assets/mri.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--refereed"> NeurIPS 2022 </span> <span class="cell__name">mRI</span> </span> </button><button class="cell" type="button" id="ms-forcing" data-slug="ms-forcing" aria-haspopup="dialog"> <img src="./assets/msforcing.jpg" alt="" loading="lazy" decoding="async"> <span class="cell__bar"> <span class="pill pill--preprint"> arXiv 2026 </span> <span class="cell__name">Ms. Forcing</span> </span> </button><button class="cell" type="button" id="umo" data-slug="umo" aria-haspopup="dialog"> <video src="./assets/umo.mp4" poster="./assets/umo.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--preprint"> arXiv 2026 </span> <span class="cell__name">UMO</span> </span> </button><button class="cell" type="button" id="iam" data-slug="iam" aria-haspopup="dialog"> <img src="./assets/iam.jpg" alt="" loading="lazy" decoding="async"> <span class="cell__bar"> <span class="pill pill--preprint"> arXiv 2026 </span> <span class="cell__name">IAM</span> </span> </button><button class="cell" type="button" id="llamo" data-slug="llamo" aria-haspopup="dialog"> <video src="./assets/llamo.mp4" poster="./assets/llamo.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--refereed"> CVPR 2026 </span> <span class="cell__name">LLaMo</span> </span> </button><button class="cell" type="button" id="phd" data-slug="phd" aria-haspopup="dialog"> <video src="./assets/phd.mp4" poster="./assets/phd.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--refereed"> ICCV 2025 </span> <span class="cell__name">PHD</span> </span> </button><button class="cell" type="button" id="panohead" data-slug="panohead" aria-haspopup="dialog"> <video src="./assets/panohead.mp4" poster="./assets/panohead.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--refereed"> CVPR 2023 </span> <span class="cell__name">PanoHead</span> </span> </button><button class="cell" type="button" id="spherehead" data-slug="spherehead" aria-haspopup="dialog"> <video src="./assets/spherehead.mp4" poster="./assets/spherehead.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--refereed"> ECCV 2024 </span> <span class="cell__name">SphereHead</span> </span> </button><button class="cell" type="button" id="panic3d" data-slug="panic3d" aria-haspopup="dialog"> <video src="./assets/panic3d.mp4" poster="./assets/panic3d.jpg" playsinline muted loop preload="none" aria-hidden="true" data-autoplay></video> <span class="cell__bar"> <span class="pill pill--refereed"> CVPR 2023 </span> <span class="cell__name">PAniC-3D</span> </span> </button> </main> </div> <div class="detail" data-detail hidden> <div class="detail__scrim" data-detail-close></div> <div class="detail__panel" role="dialog" aria-modal="true" aria-labelledby="detail-title"> <button class="detail__close" type="button" data-detail-close aria-label="Close">×</button> <div class="detail__meta"> <span class="pill" data-detail-venue></span> <span class="role" data-detail-role></span> </div> <h3 id="detail-title" data-detail-title></h3> <p class="detail__authors" data-detail-authors></p> <p class="detail__contribution" data-detail-contribution></p> <div class="link-row link-row--tight" data-detail-links></div> </div> </div> <script type="application/json" data-detail-source>{"humanclaw":{"title":"HumanCLAW: Can Vision-Language Models Act Through a Body?","venue":"arXiv 2026","refereed":false,"role":{"label":"Author 12 of 18","strong":false},"authors":"Li Siyao, Jiawei Gu, Shuai Liu, Kairui Hu, Zekun Li, Linjie Li, Chengcheng Tang, Po-Chen Wu, Ivan Shugurov, Lingni Ma, Michael Zollhoefer, Sizhe An, Abhay Mittal, Amy Zhao, Ranjay Krishna, Manling Li, Ziwei Liu, Chuan Guo","contribution":"Separating the decision from the motor execution that carries it out makes embodied failure attributable: the model chose wrong, or the body could not do it.","links":[{"label":"Project","href":"https://human-claw.github.io/"},{"label":"Paper","href":"https://arxiv.org/abs/2607.27180"}]},"show3d":{"title":"SHOW3D: Capturing Scenes of 3D Hands and Objects in the Wild","venue":"CVPR 2026","refereed":true,"role":{"label":"Author 7 of 11","strong":false},"authors":"Patrick Rim, Kevin Harris, Braden Copple, Shangchen Han, Xu Xie, Ivan Shugurov, Sizhe An, He Wen, Alex Wong, Tomas Hodan, Kun He","contribution":"Dexterous manipulation needs contact-rich data from real environments, not a capture dome — this is the rig and the pipeline that produce it.","links":[{"label":"Project","href":"https://show3d-dataset.github.io/"},{"label":"Paper","href":"https://arxiv.org/abs/2603.28760"}]},"ms-forcing":{"title":"Ms. Forcing: Efficient Streaming Video Generation with Multi-Scale Patchification and Attention","venue":"arXiv 2026","refereed":false,"role":{"label":"Author 7 of 8","strong":false},"authors":"Zekun Li, Xiaoyan Cong, Hongyu Li, Zhiyang Dou, Chuan Guo, Abhay Mittal, Sizhe An, Srinath Sridhar","contribution":"Streaming is what separates a video model from a world model an agent can act inside — it has to keep up with the agent, in real time.","links":[{"label":"Paper","href":"https://arxiv.org/abs/2607.20940"}]},"umo":{"title":"UMO: Unified In-Context Learning Unlocks Motion Foundation Model Priors","venue":"arXiv 2026","refereed":false,"role":{"label":"Author 8 of 12","strong":false},"authors":"Xiaoyan Cong, Zekun Li, Zhiyang Dou, Hongyu Li, Omid Taheri, Chuan Guo, Abhay Mittal, Sizhe An, Taku Komura, Wojciech Matusik, Michael J. Black, Srinath Sridhar","contribution":"One pretrained motion prior, prompted rather than retrained, covers behaviors and constraints that normally need a model each.","links":[{"label":"Project","href":"https://oliver-cong02.github.io/UMO.github.io/"},{"label":"Paper","href":"https://arxiv.org/abs/2603.15975"},{"label":"Code","href":"https://github.com/Oliver-Cong02/UMO"}]},"iam":{"title":"IAM: Identity-Aware Human Motion and Shape Joint Generation","venue":"arXiv 2026","refereed":false,"role":{"label":"Last author","strong":true},"authors":"Wenqi Jia, Zekun Li, Abhay Mittal, Chengcheng Tang, Chuan Guo, Lezi Wang, James Matthew Rehg, Lingling Tao, Sizhe An","contribution":"Body morphology changes how a motion actually looks — generating shape and motion together keeps the two from contradicting each other.","links":[{"label":"Project","href":"https://vjwq.github.io/IAM/"},{"label":"Paper","href":"https://arxiv.org/abs/2604.25164"}]},"llamo":{"title":"LLaMo: Scaling Pretrained Language Models for Unified Motion Understanding and Generation with Continuous Autoregressive Tokens","venue":"CVPR 2026","refereed":true,"role":{"label":"Second author","strong":true},"authors":"Zekun Li, Sizhe An, Chengcheng Tang, Chuan Guo, Ivan Shugurov, Linguang Zhang, Amy Zhao, Srinath Sridhar, Lingling Tao, Abhay Mittal","contribution":"Continuous tokens avoid the quantization jitter of discrete motion codes while leaving the pretrained language model intact.","links":[{"label":"Project","href":"https://kunkun0w0.github.io/project/LLaMo/"},{"label":"Paper","href":"https://arxiv.org/abs/2602.12370"},{"label":"CVPR","href":"https://cvpr.thecvf.com/virtual/2026/poster/38091"}]},"phd":{"title":"PHD: Personalized 3D Human Body Fitting with Point Diffusion","venue":"ICCV 2025","refereed":true,"role":{"label":"Author 7 of 9","strong":false},"authors":"Hsuan-I Ho, Chen Guo, Po-Chen Wu, Ivan Shugurov, Chengcheng Tang, Abhay Mittal, Sizhe An, Manuel Kaufmann, Linguang Zhang","contribution":"Knowing whose body it is turns fitting from a guess about shape into a pose problem, which is where the accuracy comes from.","links":[{"label":"Project","href":"https://phd-pose.github.io/"},{"label":"Paper","href":"https://arxiv.org/abs/2508.21257"}]},"panohead":{"title":"PanoHead: Geometry-Aware 3D Full-Head Synthesis in 360°","venue":"CVPR 2023","refereed":true,"role":{"label":"First author","strong":true},"authors":"Sizhe An, Hongyi Xu, Yichun Shi, Guoxian Song, Umit Ogras, Linjie Luo","contribution":"The first 3D-aware GAN to synthesize a full head rather than a frontal face — back of the skull and hair included.","links":[{"label":"Project","href":"/panohead/"},{"label":"Paper","href":"https://arxiv.org/abs/2303.13071"},{"label":"Code","href":"https://github.com/sizhean/panohead"}]},"spherehead":{"title":"SphereHead: Stable 3D Full-head Synthesis with Spherical Tri-plane Representation","venue":"ECCV Oral 2024","refereed":true,"role":{"label":"Author 5 of 7","strong":false},"authors":"Heyuan Li, Ce Chen, Tianhao Shi, Yuda Qiu, Sizhe An, Guanying Chen, Xiaoguang Han","contribution":"Follow-up to PanoHead: the geometry representation, not the generator, was what capped full-head quality.","links":[{"label":"Project","href":"https://lhyfst.github.io/spherehead/"},{"label":"Paper","href":"https://arxiv.org/abs/2404.05680"}]},"mri":{"title":"mRI: Multi-modal 3D Human Pose Estimation Dataset using mmWave, RGB-D, and Inertial Sensors","venue":"NeurIPS Datasets & Benchmarks 2022","refereed":true,"role":{"label":"First author","strong":true},"authors":"Sizhe An, Yin Li, Umit Ogras","contribution":"Pairs three very different sensing modalities on the same subjects, so cross-modal pose methods have something to train and be measured on.","links":[{"label":"Project","href":"/mri/"},{"label":"Paper","href":"https://arxiv.org/abs/2210.08394"},{"label":"Code","href":"https://github.com/sizhean/mri"}]},"panic3d":{"title":"PAniC-3D: Stylized Single-view 3D Reconstruction from Portraits of Anime Characters","venue":"CVPR 2023","refereed":true,"role":{"label":"Author 7 of 10","strong":false},"authors":"Shuhong Chen, Kevin Zhang, Yichun Shi, Heng Wang, Yiheng Zhu, Guoxian Song, Sizhe An, Janus Kristjansson, Xiao Yang, Matthias Zwicker","contribution":"Crosses the domain gap between 2D stylized portraits and animatable 3D heads, where photoreal face priors do not transfer.","links":[{"label":"Code","href":"https://github.com/ShuhongChen/panic3d-anime-reconstruction"},{"label":"Paper","href":"https://arxiv.org/abs/2303.14587"},{"label":"Video","href":"https://www.youtube.com/watch?v=7NosmLieg6A"}]}}</script>  </div> <script>
+      // Clips carry no autoplay attribute: they start only once on screen, and
+      // never when the visitor has asked for reduced motion. Poster frames mean
+      // the tiles still read correctly if this never runs.
+      (() => {
+        const clips = document.querySelectorAll('video[data-autoplay]');
+        if (!clips.length) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!('IntersectionObserver' in window)) {
+          clips.forEach((clip) => clip.play().catch(() => {}));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.play().catch(() => {});
+              } else {
+                entry.target.pause();
+              }
+            }
+          },
+          { rootMargin: '250px 0px' },
+        );
+
+        clips.forEach((clip) => observer.observe(clip));
+      })();
+    </script> </body> </html> <script>
+  (() => {
+    const source = document.querySelector('[data-detail-source]');
+    const panel = document.querySelector('[data-detail]');
+    if (!source || !panel) return;
+    const data = JSON.parse(source.textContent || '{}');
+
+    const el = (name) => panel.querySelector(`[data-detail-${name}]`);
+    const venue = el('venue');
+    const role = el('role');
+    const title = el('title');
+    const authors = el('authors');
+    const contribution = el('contribution');
+    const links = el('links');
+
+    const close = () => {
+      panel.hidden = true;
+      document.body.style.overflow = '';
+    };
+
+    const open = (slug) => {
+      const item = data[slug];
+      if (!item) return;
+      venue.textContent = item.venue;
+      venue.className = `pill ${item.refereed ? 'pill--refereed' : 'pill--preprint'}`;
+      role.textContent = item.role.label;
+      role.className = `role ${item.role.strong ? 'role--strong' : ''}`;
+      title.textContent = item.title;
+      authors.textContent = item.authors;
+      contribution.textContent = item.contribution;
+      links.replaceChildren(
+        ...item.links.map((link) => {
+          const a = document.createElement('a');
+          a.className = 'chip chip--sm';
+          a.href = link.href;
+          a.textContent = link.label;
+          return a;
+        }),
+      );
+      panel.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+
+    document.querySelectorAll('.cell').forEach((cell) => {
+      cell.addEventListener('click', () => open(cell.dataset.slug));
+    });
+    panel.querySelectorAll('[data-detail-close]').forEach((node) => {
+      node.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !panel.hidden) close();
+    });
+  })();
+</script>

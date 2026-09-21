@@ -1,0 +1,63 @@
+<!DOCTYPE html><html lang="en" data-theme="dark"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="Astro v5.18.2"><meta name="description" content="A multimodal dataset and benchmark for 3D human pose estimation from mmWave radar, RGB-D and inertial sensors."><meta property="og:title" content="mRI — Sizhe An"><meta property="og:description" content="A multimodal dataset and benchmark for 3D human pose estimation from mmWave radar, RGB-D and inertial sensors."><meta property="og:type" content="website"><meta property="og:url" content="https://sizhean.github.io/"><meta property="og:image" content="https://sizhean.github.io/assets/og.jpg"><meta name="twitter:card" content="summary_large_image"><meta name="theme-color" content="#0a0b0d"><link rel="icon" href="../favicon.svg" type="image/svg+xml"><title>mRI — Sizhe An</title><script>
+      // Runs before paint so a stored light preference doesn't flash dark first.
+      try {
+        if (localStorage.getItem('theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+        }
+      } catch {}
+    </script><link rel="stylesheet" href="../_astro/index.BhV73KoB.css"></head> <body> <div class="site-shell">  <header class="topbar topbar--simple"> <a href="../" class="wordmark">Sizhe An</a> <nav aria-label="Project navigation"> <a href="../">Home</a> <a href="../panohead/">PanoHead</a> <button class="theme-toggle" type="button" data-theme-toggle> <span data-theme-toggle-label>Dark</span> </button> <script>
+  (() => {
+    const root = document.documentElement;
+    const button = document.querySelector('[data-theme-toggle]');
+    const label = document.querySelector('[data-theme-toggle-label]');
+    if (!button || !label) return;
+
+    const render = () => {
+      // Label the action, not the state: "Dark" while in dark mode reads as both.
+      const isLight = root.dataset.theme === 'light';
+      label.textContent = isLight ? 'Dark' : 'Light';
+      button.setAttribute('aria-label', `Switch to ${isLight ? 'dark' : 'light'} appearance`);
+      button.setAttribute('aria-pressed', String(isLight));
+    };
+
+    button.addEventListener('click', () => {
+      root.dataset.theme = root.dataset.theme === 'light' ? 'dark' : 'light';
+      try {
+        localStorage.setItem('theme', root.dataset.theme);
+      } catch {
+        // Private mode / blocked storage: the toggle still works for this page view.
+      }
+      render();
+    });
+
+    render();
+  })();
+</script> </nav> </header> <main class="project-page"> <p class="eyebrow">NeurIPS Datasets &amp; Benchmarks 2022</p> <h1>mRI: Multi-modal 3D Human Pose Estimation Dataset using mmWave, RGB-D, and Inertial Sensors</h1> <article class="tile" id="mri"> <div class="tile__media"> <video src="../assets/mri.mp4" poster="../assets/mri.jpg" playsinline muted loop preload="none" aria-label="mRI multimodal 3D pose estimation across RGB, IMU and radar inputs" data-autoplay></video> </div> <div class="tile__body"> <div class="tile__meta"> <span class="pill pill--refereed"> NeurIPS Datasets &amp; Benchmarks 2022 </span> <span class="role role--strong">First author</span> </div> <h3> <a href="../mri/">mRI: Multi-modal 3D Human Pose Estimation Dataset using mmWave, RGB-D, and Inertial Sensors</a> </h3> <p class="tile__authors" title="Sizhe An, Yin Li, Umit Ogras"> <strong>Sizhe An</strong>, Yin Li, Umit Ogras </p> <p class="tile__contribution">Pairs three very different sensing modalities on the same subjects, so cross-modal pose methods have something to train and be measured on.</p> <div class="link-row link-row--tight"> <a class="chip chip--sm" href="../mri/">Project</a><a class="chip chip--sm" href="https://arxiv.org/abs/2210.08394">Paper</a><a class="chip chip--sm" href="https://github.com/sizhean/mri">Code</a> </div> </div> </article> </main>  </div> <script>
+      // Clips carry no autoplay attribute: they start only once on screen, and
+      // never when the visitor has asked for reduced motion. Poster frames mean
+      // the tiles still read correctly if this never runs.
+      (() => {
+        const clips = document.querySelectorAll('video[data-autoplay]');
+        if (!clips.length) return;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!('IntersectionObserver' in window)) {
+          clips.forEach((clip) => clip.play().catch(() => {}));
+          return;
+        }
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            for (const entry of entries) {
+              if (entry.isIntersecting) {
+                entry.target.play().catch(() => {});
+              } else {
+                entry.target.pause();
+              }
+            }
+          },
+          { rootMargin: '250px 0px' },
+        );
+
+        clips.forEach((clip) => observer.observe(clip));
+      })();
+    </script> </body> </html>
