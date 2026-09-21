@@ -681,6 +681,15 @@ h1 {
   font-size: 1.1rem;
 }
 
+.film__bridge {
+  max-width: 62ch;
+  margin-bottom: 26px;
+  padding-left: 14px;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
 .metrics--film {
   border-top-color: var(--line-strong);
 }

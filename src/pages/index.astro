@@ -41,6 +41,7 @@ const years = new Date().getFullYear() - profile.since.year;
         <p class="eyebrow">{profile.name} · {profile.role} · {profile.affiliation}</p>
         <h1>{thesis.statement}</h1>
         <p class="film__standfirst">{thesis.standfirst}</p>
+        <p class="film__bridge">{profile.bridge}</p>
         <ul class="metrics metrics--film" aria-label="Publication record">
           {venues.map((venue) => <li>{venue.label}{venue.count > 1 && ` ×${venue.count}`}</li>)}
           <li><a href={profile.github.repo}>{profile.github.label} ★{profile.github.stars.toLocaleString('en-US')}</a></li>
