@@ -1,14 +1,15 @@
 export type ProfileLink = {
   label: string;
   href: string;
-  /** Rendered as a muted, non-clickable chip until the target exists. */
-  pending?: boolean;
-  note?: string;
 };
 
 export type FocusArea = {
   label: string;
   description: string;
+  /** Slugs from publications.ts. A claim with nothing attached reads as an aspiration. */
+  evidence: string[];
+  /** Set where the substantive work is internal and cannot be shown. */
+  internalNote?: string;
 };
 
 export const profile = {
@@ -17,8 +18,6 @@ export const profile = {
   affiliation: 'Meta',
   location: 'Redmond, WA',
   email: 'sizhe.an@wisc.edu',
-  portrait: '/assets/profile.jpg',
-  portraitAlt: 'Portrait of Sizhe An',
 
   /** Full positioning line, verbatim. Used for <title>/meta/OG copy. */
   oneLiner:
@@ -32,18 +31,20 @@ export const profile = {
     foundation: 'Built on a foundation of multi-modal motion generation and 3D humans.',
   },
 
+  /**
+   * Reconciles the robotics headline with a public record that is motion and
+   * 3D humans. Without this a reviewer assumes the claim is unsupported rather
+   * than unpublishable. Deliberately stops at "internal" — no specifics.
+   */
+  bridge:
+    'The robot learning work at Meta is internal and not publishable. What is public is the layer underneath it: the data, the motion and shape representations, and the 3D-human models that embodied policies are built on.',
+
   links: [
     {
       label: 'Scholar',
       href: 'https://scholar.google.com/citations?user=l0XPLQcAAAAJ&hl=en',
     },
     { label: 'GitHub', href: 'https://github.com/SizheAn' },
-    {
-      label: 'CV',
-      href: '/assets/cv.pdf',
-      pending: true,
-      note: 'Drop cv.pdf into public/assets/ to activate.',
-    },
     { label: 'Email', href: 'mailto:sizhe.an@wisc.edu' },
   ] satisfies ProfileLink[],
 
@@ -57,6 +58,16 @@ export const profile = {
     count: undefined as number | undefined,
   },
 
+  /** Checkable on the repo page. Drifts upward, so it carries the date it was read. */
+  github: {
+    repo: 'https://github.com/SizheAn/PanoHead',
+    label: 'PanoHead',
+    stars: 1958,
+    checked: '2026-09-20',
+  },
+
+  since: { label: 'Meta', year: 2023 },
+
   /**
    * Public-level research directions only. No internal project names, data
    * volumes, or infrastructure specifics.
@@ -66,16 +77,21 @@ export const profile = {
       label: 'Robotics data pipeline & infrastructure',
       description:
         'Collecting, curating, and serving robot-learning data at scale — teleoperation, human video, simulation — so heterogeneous demonstrations become something a policy can train on.',
+      evidence: ['mri', 'show3d'],
+      internalNote: 'The pipeline itself is internal; the public proof is the capture and benchmark work below.',
     },
     {
       label: 'VLA & world-action models',
       description:
         'Vision-language-action policies that read an instruction and a scene and emit control, paired with world models that predict what a body does next, so perception, prediction, and action share one representation.',
+      evidence: ['humanclaw', 'ms-forcing', 'umo'],
     },
     {
       label: 'Dexterous manipulation',
       description:
         'Multi-fingered hands: contact-rich grasping, in-hand reorientation, and retargeting human hand motion onto robot hardware without losing the dexterity that made the demonstration useful.',
+      evidence: ['show3d'],
+      internalNote: 'Policy work is internal; the public proof is in-the-wild hand-object capture.',
     },
   ] satisfies FocusArea[],
 

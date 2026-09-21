@@ -1,15 +1,25 @@
 ---
 import type { FocusArea } from '../data/profile';
+import { publications } from '../data/publications';
 
 interface Props extends FocusArea {
   index: number;
 }
 
-const { label, description, index } = Astro.props;
+const { label, description, evidence, internalNote, index } = Astro.props;
+const backing = evidence
+  .map((slug) => publications.find((publication) => publication.slug === slug))
+  .filter((publication) => publication !== undefined);
 ---
 
 <article class="focus-card">
   <span class="focus-card__index">{String(index + 1).padStart(2, '0')}</span>
   <h3>{label}</h3>
   <p>{description}</p>
+  {internalNote && <p class="focus-card__internal">{internalNote}</p>}
+  <div class="link-row link-row--tight">
+    {backing.map((publication) => (
+      <a class="chip chip--sm" href={`#${publication.slug}`}>{publication.shortTitle}</a>
+    ))}
+  </div>
 </article>

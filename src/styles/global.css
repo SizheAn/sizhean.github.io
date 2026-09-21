@@ -133,29 +133,10 @@ li {
   font-size: 0.8rem;
 }
 
-.chip--pending {
-  border-style: dashed;
-  border-color: var(--line);
-  color: var(--muted);
-  cursor: default;
-}
-
-.chip--pending:hover {
-  border-color: var(--line);
-  color: var(--muted);
-}
-
-.chip--pending em {
-  font-family: var(--mono);
-  font-size: 0.68rem;
-  font-style: normal;
-  letter-spacing: 0.08em;
-  opacity: 0.7;
-}
-
 .pill {
   display: inline-block;
   padding: 3px 9px;
+  border: 1px solid transparent;
   border-radius: 4px;
   background: var(--surface-2);
   color: var(--muted);
@@ -164,6 +145,51 @@ li {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+/* Refereed venues are filled; preprints are outlined. Four arXiv badges at
+   parity with CVPR/ICCV/NeurIPS reads as padding. */
+.pill--refereed {
+  background: var(--ink);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+.pill--preprint {
+  background: transparent;
+  border-color: var(--line-strong);
+}
+
+.role {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.role--strong {
+  color: var(--accent);
+}
+
+/* Proof above the fold: derived venue tally + checkable star count. */
+.metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: 0 0 26px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.metrics a:hover {
+  color: var(--accent);
 }
 
 .link-row {
@@ -240,7 +266,7 @@ nav a:hover {
 
 .hero {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 300px);
   gap: 56px;
   align-items: start;
   padding: 88px 0 96px;
@@ -275,55 +301,60 @@ h1 {
   text-wrap: balance;
 }
 
-.hero__foundation {
-  max-width: 72ch;
-  margin-bottom: 30px;
+/* The claim/evidence reconciliation. Muted, but it must not be missable. */
+.hero__bridge {
+  max-width: 62ch;
+  margin-bottom: 26px;
   padding-left: 14px;
-  border-left: 2px solid var(--line-strong);
+  border-left: 2px solid var(--accent);
   color: var(--muted);
   font-size: 0.98rem;
 }
 
-.scholar-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 22px;
-  padding: 6px 12px;
+.hero__marquee {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.hero__marquee a {
+  position: relative;
+  display: block;
+  overflow: hidden;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  background: var(--surface);
+  border-radius: 8px;
+  aspect-ratio: 16 / 10;
+}
+
+.hero__marquee img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero__marquee span {
+  position: absolute;
+  left: 8px;
+  bottom: 8px;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
   font-family: var(--mono);
-  font-size: 0.74rem;
-  letter-spacing: 0.06em;
+  font-size: 0.64rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.scholar-badge span {
+.focus-card__internal {
+  margin: 10px 0 0 !important;
   color: var(--muted);
+  font-size: 0.86rem;
+  font-style: italic;
+  opacity: 0.85;
 }
 
-.scholar-badge strong {
-  color: var(--accent);
-}
-
-.scholar-badge:hover {
-  border-color: var(--accent);
-}
-
-.hero__portrait {
-  margin: 0;
-}
-
-.hero__portrait img {
-  width: 100%;
-  /* Without this the height="" presentational hint wins over aspect-ratio. */
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
-  object-position: 50% 14%;
-  border: 1px solid var(--line);
-  border-radius: 10px;
+.focus-card .link-row {
+  margin-top: 14px;
 }
 
 /* ---------- sections ---------- */
@@ -554,11 +585,6 @@ h1 {
     grid-template-columns: 1fr;
     gap: 36px;
     padding: 56px 0 64px;
-  }
-
-  .hero__portrait {
-    order: -1;
-    max-width: 148px;
   }
 
   .focus-grid,

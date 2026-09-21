@@ -11,8 +11,6 @@ export type Media = {
   alt: string;
   /** Where the asset came from, so provenance is auditable. */
   source: string;
-  /** Wide paper figures need 'contain' or the tile crop destroys them. */
-  fit?: 'cover' | 'contain';
 };
 
 export type Publication = {
@@ -33,7 +31,18 @@ export type Publication = {
   }>;
   /** Position in the Selected Work grid, ordered by embodiment proximity. */
   featuredOrder?: number;
+  /** Filter facets. First entry is the paper's primary theme. */
+  topics: Topic[];
+  /**
+   * Only set this when Sizhe has confirmed the actual role. Left unset, the
+   * page falls back to author position, which is a fact rather than a claim.
+   */
+  roleNote?: string;
 };
+
+export type Topic = 'Embodied' | 'Manipulation' | 'Motion' | '3D humans' | 'Sensing';
+
+export const TOPICS: Topic[] = ['Embodied', 'Manipulation', 'Motion', '3D humans', 'Sensing'];
 
 export const publications: Publication[] = [
   {
@@ -50,6 +59,7 @@ export const publications: Publication[] = [
     contribution:
       'Separating the decision from the motor execution that carries it out makes embodied failure attributable: the model chose wrong, or the body could not do it.',
     tags: ['Embodied AI', 'VLM', 'Benchmark', 'Closed-loop control'],
+    topics: ['Embodied', 'Motion'],
     media: {
       type: 'video',
       src: '/assets/humanclaw.mp4',
@@ -77,6 +87,7 @@ export const publications: Publication[] = [
     contribution:
       'Dexterous manipulation needs contact-rich data from real environments, not a capture dome — this is the rig and the pipeline that produce it.',
     tags: ['Hands', 'Manipulation', 'Dataset', 'Egocentric'],
+    topics: ['Manipulation', 'Sensing', 'Embodied'],
     media: {
       type: 'image',
       src: '/assets/show3d.jpg',
@@ -104,15 +115,15 @@ export const publications: Publication[] = [
     contribution:
       'Streaming is what separates a video model from a world model an agent can act inside — it has to keep up with the agent, in real time.',
     tags: ['World models', 'Video generation', 'Streaming', 'Efficiency'],
+    topics: ['Embodied', 'Motion'],
     media: {
       type: 'image',
       src: '/assets/msforcing.jpg',
       alt: 'Ms. Forcing teaser: two streamed generations, an art-gallery tour and a blooming rose, annotated 22.8 FPS in real-time',
       source: 'https://kunkun0w0.github.io/images/MsForcing.png (first author page; no project site yet)',
-      fit: 'contain',
     },
     links: [{ label: 'Paper', href: 'https://arxiv.org/abs/2607.20940' }],
-    featuredOrder: 3,
+    featuredOrder: 4,
   },
   {
     slug: 'umo',
@@ -128,6 +139,7 @@ export const publications: Publication[] = [
     contribution:
       'One pretrained motion prior, prompted rather than retrained, covers behaviors and constraints that normally need a model each.',
     tags: ['In-context learning', 'Motion foundation model', 'Control', 'Embodied agents'],
+    topics: ['Motion', 'Embodied'],
     media: {
       type: 'video',
       src: '/assets/umo.mp4',
@@ -140,7 +152,7 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2603.15975' },
       { label: 'Code', href: 'https://github.com/Oliver-Cong02/UMO' },
     ],
-    featuredOrder: 4,
+    featuredOrder: 5,
   },
   {
     slug: 'iam',
@@ -157,6 +169,7 @@ export const publications: Publication[] = [
     contribution:
       'Body morphology changes how a motion actually looks — generating shape and motion together keeps the two from contradicting each other.',
     tags: ['Motion generation', 'Body shape', 'Identity', 'Multimodal'],
+    topics: ['Motion', '3D humans'],
     media: {
       type: 'image',
       src: '/assets/iam.jpg',
@@ -167,7 +180,7 @@ export const publications: Publication[] = [
       { label: 'Project', href: 'https://vjwq.github.io/IAM/' },
       { label: 'Paper', href: 'https://arxiv.org/abs/2604.25164' },
     ],
-    featuredOrder: 5,
+    featuredOrder: 6,
   },
   {
     slug: 'llamo',
@@ -184,6 +197,7 @@ export const publications: Publication[] = [
     contribution:
       'Continuous tokens avoid the quantization jitter of discrete motion codes while leaving the pretrained language model intact.',
     tags: ['Multimodal LLM', 'Motion generation', 'Motion understanding'],
+    topics: ['Motion'],
     media: {
       type: 'video',
       src: '/assets/llamo.mp4',
@@ -196,7 +210,7 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2602.12370' },
       { label: 'CVPR', href: 'https://cvpr.thecvf.com/virtual/2026/poster/38091' },
     ],
-    featuredOrder: 6,
+    featuredOrder: 7,
   },
   {
     slug: 'phd',
@@ -212,6 +226,7 @@ export const publications: Publication[] = [
     contribution:
       'Knowing whose body it is turns fitting from a guess about shape into a pose problem, which is where the accuracy comes from.',
     tags: ['3D human body', 'Diffusion', 'Pose estimation', 'Personalization'],
+    topics: ['3D humans', 'Sensing'],
     media: {
       type: 'video',
       src: '/assets/phd.mp4',
@@ -223,7 +238,7 @@ export const publications: Publication[] = [
       { label: 'Project', href: 'https://phd-pose.github.io/' },
       { label: 'Paper', href: 'https://arxiv.org/abs/2508.21257' },
     ],
-    featuredOrder: 7,
+    featuredOrder: 8,
   },
   {
     slug: 'panohead',
@@ -238,6 +253,7 @@ export const publications: Publication[] = [
     contribution:
       'The first 3D-aware GAN to synthesize a full head rather than a frontal face — back of the skull and hair included.',
     tags: ['3D generation', 'Neural rendering', 'Avatars'],
+    topics: ['3D humans'],
     media: {
       type: 'video',
       src: '/assets/panohead.mp4',
@@ -250,7 +266,7 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2303.13071' },
       { label: 'Code', href: 'https://github.com/sizhean/panohead' },
     ],
-    featuredOrder: 8,
+    featuredOrder: 9,
   },
   {
     slug: 'spherehead',
@@ -266,6 +282,7 @@ export const publications: Publication[] = [
     contribution:
       'Follow-up to PanoHead: the geometry representation, not the generator, was what capped full-head quality.',
     tags: ['3D generation', 'Tri-plane', 'Full-head synthesis'],
+    topics: ['3D humans'],
     media: {
       type: 'video',
       src: '/assets/spherehead.mp4',
@@ -277,7 +294,7 @@ export const publications: Publication[] = [
       { label: 'Project', href: 'https://lhyfst.github.io/spherehead/' },
       { label: 'Paper', href: 'https://arxiv.org/abs/2404.05680' },
     ],
-    featuredOrder: 9,
+    featuredOrder: 10,
   },
   {
     slug: 'mri',
@@ -293,6 +310,7 @@ export const publications: Publication[] = [
     contribution:
       'Pairs three very different sensing modalities on the same subjects, so cross-modal pose methods have something to train and be measured on.',
     tags: ['Multimodal sensing', '3D pose', 'mmWave', 'Dataset'],
+    topics: ['Sensing', '3D humans'],
     media: {
       type: 'video',
       src: '/assets/mri.mp4',
@@ -305,6 +323,7 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2210.08394' },
       { label: 'Code', href: 'https://github.com/sizhean/mri' },
     ],
+    featuredOrder: 3,
   },
   {
     slug: 'panic3d',
@@ -319,6 +338,7 @@ export const publications: Publication[] = [
     contribution:
       'Crosses the domain gap between 2D stylized portraits and animatable 3D heads, where photoreal face priors do not transfer.',
     tags: ['3D reconstruction', 'Stylized characters', 'Neural rendering'],
+    topics: ['3D humans'],
     media: {
       type: 'video',
       src: '/assets/panic3d.mp4',
@@ -343,3 +363,69 @@ export const featuredWork: Publication[] = publications
 export const otherPublications: Publication[] = publications.filter(
   (publication) => publication.featuredOrder === undefined,
 );
+
+export const AUTHOR_NAME = 'Sizhe An';
+
+const splitAuthors = (authors: string) =>
+  authors
+    .split(',')
+    .map((name) => name.trim())
+    .filter(Boolean);
+
+/**
+ * Author position is a fact. "Led" is a claim only Sizhe can make, so until he
+ * fills in roleNote the page states the position and stops there — a reviewer
+ * counting names in the author list must not be able to catch the page out.
+ */
+export function authorRole(publication: Publication): { label: string; strong: boolean } {
+  if (publication.roleNote) {
+    return { label: publication.roleNote, strong: true };
+  }
+
+  const names = splitAuthors(publication.authors);
+  const index = names.indexOf(AUTHOR_NAME);
+  const total = names.length;
+
+  if (index === 0) return { label: 'First author', strong: true };
+  if (index === total - 1) return { label: 'Last author', strong: true };
+  if (index === 1) return { label: 'Second author', strong: true };
+  return { label: `Author ${index + 1} of ${total}`, strong: false };
+}
+
+/** "First, …, Sizhe An, …, Last" — an 18-name list is noise at tile scale. */
+export function shortAuthors(authors: string, limit = 5): string {
+  const names = splitAuthors(authors);
+  if (names.length <= limit) return names.join(', ');
+
+  const keep = new Set([0, names.length - 1]);
+  const index = names.indexOf(AUTHOR_NAME);
+  if (index >= 0) keep.add(index);
+
+  const parts: string[] = [];
+  let skipped = false;
+  names.forEach((name, i) => {
+    if (keep.has(i)) {
+      if (skipped) parts.push('…');
+      parts.push(name);
+      skipped = false;
+    } else {
+      skipped = true;
+    }
+  });
+  return parts.join(', ');
+}
+
+export const isPeerReviewed = (publication: Publication) =>
+  !/arxiv|preprint/i.test(publication.venue);
+
+/** Peer-reviewed venues only, for the credential strip. Derived, never hand-typed. */
+export function venueTally(): Array<{ label: string; count: number }> {
+  const counts = new Map<string, number>();
+  for (const publication of publications) {
+    if (!isPeerReviewed(publication)) continue;
+    counts.set(publication.venue, (counts.get(publication.venue) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([label, count]) => ({ label, count }));
+}

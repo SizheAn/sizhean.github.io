@@ -1,5 +1,5 @@
 ---
-import { profile } from '../data/profile';
+import { AUTHOR_NAME, authorRole, isPeerReviewed, shortAuthors } from '../data/publications';
 import type { Publication } from '../data/publications';
 
 interface Props {
@@ -9,12 +9,14 @@ interface Props {
 const { publication } = Astro.props;
 const { media } = publication;
 const primaryHref = publication.links[0]?.href;
+const role = authorRole(publication);
+const refereed = isPeerReviewed(publication);
 // Split rather than string-replace so the author name is emphasized as markup.
-const authorParts = publication.authors.split(profile.name);
+const authorParts = shortAuthors(publication.authors).split(AUTHOR_NAME);
 ---
 
 <article class="tile" id={publication.slug}>
-  <div class:list={['tile__media', media.fit === 'contain' && 'tile__media--contain']}>
+  <div class="tile__media">
     {
       media.type === 'video' ? (
         <video
@@ -35,19 +37,21 @@ const authorParts = publication.authors.split(profile.name);
 
   <div class="tile__body">
     <div class="tile__meta">
-      <span class="pill">{publication.venue} {publication.year}</span>
-      <span class="tile__theme">{publication.theme}</span>
+      <span class:list={['pill', refereed ? 'pill--refereed' : 'pill--preprint']}>
+        {publication.venue} {publication.year}
+      </span>
+      <span class:list={['role', role.strong && 'role--strong']}>{role.label}</span>
     </div>
 
     <h3>
       {primaryHref ? <a href={primaryHref}>{publication.title}</a> : publication.title}
     </h3>
 
-    <p class="tile__authors">
+    <p class="tile__authors" title={publication.authors}>
       {
         authorParts.map((part, index) => (
           <>
-            {index > 0 && <strong>{profile.name}</strong>}
+            {index > 0 && <strong>{AUTHOR_NAME}</strong>}
             {part}
           </>
         ))

@@ -1,7 +1,11 @@
 ---
 import { profile } from '../data/profile';
+import { featuredWork, venueTally } from '../data/publications';
 
-const { positioning, scholarBadge } = profile;
+const { positioning, scholarBadge, github } = profile;
+const venues = venueTally();
+const marquee = featuredWork.slice(0, 3);
+const years = new Date().getFullYear() - profile.since.year;
 ---
 
 <section class="hero" id="top">
@@ -10,36 +14,38 @@ const { positioning, scholarBadge } = profile;
     <h1>{profile.name}</h1>
     <p class="hero__lead">{positioning.lead}</p>
     <p class="hero__statement">{positioning.statement}</p>
-    <p class="hero__foundation">{positioning.foundation}</p>
+    <p class="hero__bridge">{profile.bridge}</p>
 
-    <div class="link-row" aria-label="Profile links">
+    <ul class="metrics" aria-label="Publication record">
       {
-        profile.links.map((link) =>
-          link.pending ? (
-            <span class="chip chip--pending" title={link.note}>
-              {link.label}
-              <em>soon</em>
-            </span>
-          ) : (
-            <a class="chip" href={link.href}>
-              {link.label}
+        scholarBadge.count !== undefined && (
+          <li>
+            <a href={scholarBadge.href}>
+              {scholarBadge.count.toLocaleString('en-US')} citations
             </a>
-          ),
+          </li>
         )
       }
-    </div>
+      {venues.map((venue) => <li>{venue.label}{venue.count > 1 && ` ×${venue.count}`}</li>)}
+      <li>
+        <a href={github.repo}>{github.label} ★{github.stars.toLocaleString('en-US')}</a>
+      </li>
+      <li>{years} yrs @ {profile.since.label}</li>
+    </ul>
 
-    {
-      scholarBadge.count !== undefined && (
-        <a class="scholar-badge" href={scholarBadge.href}>
-          <span>{scholarBadge.label}</span>
-          <strong>{scholarBadge.count.toLocaleString('en-US')}</strong>
-        </a>
-      )
-    }
+    <div class="link-row" aria-label="Profile links">
+      {profile.links.map((link) => <a class="chip" href={link.href}>{link.label}</a>)}
+    </div>
   </div>
 
-  <figure class="hero__portrait">
-    <img src={profile.portrait} alt={profile.portraitAlt} width="480" height="480" />
-  </figure>
+  <div class="hero__marquee" aria-hidden="true">
+    {
+      marquee.map((publication) => (
+        <a href={`#${publication.slug}`}>
+          <img src={publication.media.poster ?? publication.media.src} alt="" loading="eager" />
+          <span>{publication.shortTitle}</span>
+        </a>
+      ))
+    }
+  </div>
 </section>

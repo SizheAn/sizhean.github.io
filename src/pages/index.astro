@@ -71,13 +71,11 @@ import { featuredWork, otherPublications } from '../data/publications';
     <p>{profile.name} · {profile.affiliation} · {profile.location}</p>
     <div class="link-row link-row--tight">
       {
-        profile.links
-          .filter((link) => !link.pending)
-          .map((link) => (
-            <a class="chip chip--sm" href={link.href}>
-              {link.label}
-            </a>
-          ))
+        profile.links.map((link) => (
+          <a class="chip chip--sm" href={link.href}>
+            {link.label}
+          </a>
+        ))
       }
     </div>
   </footer>
