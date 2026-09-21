@@ -17,6 +17,8 @@ export type Publication = {
   slug: string;
   title: string;
   shortTitle: string;
+  /** arXiv submission month, YYYY-MM. Drives the dated "Now" list. */
+  posted: string;
   authors: string;
   venue: string;
   year: string;
@@ -47,6 +49,7 @@ export const TOPICS: Topic[] = ['Embodied', 'Manipulation', 'Motion', '3D humans
 export const publications: Publication[] = [
   {
     slug: 'humanclaw',
+    posted: '2026-07',
     shortTitle: 'HumanCLAW',
     title: 'HumanCLAW: Can Vision-Language Models Act Through a Body?',
     authors:
@@ -75,6 +78,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'show3d',
+    posted: '2026-03',
     shortTitle: 'SHOW3D',
     title: 'SHOW3D: Capturing Scenes of 3D Hands and Objects in the Wild',
     authors:
@@ -102,6 +106,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'ms-forcing',
+    posted: '2026-07',
     shortTitle: 'Ms. Forcing',
     title:
       'Ms. Forcing: Efficient Streaming Video Generation with Multi-Scale Patchification and Attention',
@@ -127,6 +132,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'umo',
+    posted: '2026-03',
     shortTitle: 'UMO',
     title: 'UMO: Unified In-Context Learning Unlocks Motion Foundation Model Priors',
     authors:
@@ -156,6 +162,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'iam',
+    posted: '2026-04',
     shortTitle: 'IAM',
     title: 'IAM: Identity-Aware Human Motion and Shape Joint Generation',
     // arXiv lists the last author as "Size An" — a typo for Sizhe An. Corrected here.
@@ -184,6 +191,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'llamo',
+    posted: '2026-02',
     shortTitle: 'LLaMo',
     title:
       'LLaMo: Scaling Pretrained Language Models for Unified Motion Understanding and Generation with Continuous Autoregressive Tokens',
@@ -214,6 +222,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'phd',
+    posted: '2025-08',
     shortTitle: 'PHD',
     title: 'PHD: Personalized 3D Human Body Fitting with Point Diffusion',
     authors:
@@ -242,6 +251,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'panohead',
+    posted: '2023-03',
     shortTitle: 'PanoHead',
     title: 'PanoHead: Geometry-Aware 3D Full-Head Synthesis in 360°',
     authors: 'Sizhe An, Hongyi Xu, Yichun Shi, Guoxian Song, Umit Ogras, Linjie Luo',
@@ -270,6 +280,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'spherehead',
+    posted: '2024-04',
     shortTitle: 'SphereHead',
     title: 'SphereHead: Stable 3D Full-head Synthesis with Spherical Tri-plane Representation',
     authors:
@@ -298,6 +309,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'mri',
+    posted: '2022-10',
     shortTitle: 'mRI',
     title:
       'mRI: Multi-modal 3D Human Pose Estimation Dataset using mmWave, RGB-D, and Inertial Sensors',
@@ -327,6 +339,7 @@ export const publications: Publication[] = [
   },
   {
     slug: 'panic3d',
+    posted: '2023-03',
     shortTitle: 'PAniC-3D',
     title: 'PAniC-3D: Stylized Single-view 3D Reconstruction from Portraits of Anime Characters',
     authors:

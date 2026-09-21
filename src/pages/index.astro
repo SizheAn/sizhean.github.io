@@ -1,82 +1,195 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import FocusCard from '../components/FocusCard.astro';
-import Hero from '../components/Hero.astro';
-import PublicationCard from '../components/PublicationCard.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import { profile } from '../data/profile';
-import { featuredWork, otherPublications } from '../data/publications';
+import { authorRole, isPeerReviewed, publications, venueTally } from '../data/publications';
+
+// Wall order: embodiment proximity first, then everything else by recency.
+const wall = [...publications].sort(
+  (a, b) =>
+    (a.featuredOrder ?? 99) - (b.featuredOrder ?? 99) || b.posted.localeCompare(a.posted),
+);
+
+// Dated liveness signal, derived from verified arXiv submission months.
+const now = [...publications]
+  .sort((a, b) => b.posted.localeCompare(a.posted))
+  .slice(0, 4);
+
+const months = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+];
+const stamp = (posted: string) => {
+  const [year, month] = posted.split('-');
+  return `${months[Number(month) - 1]} ${year}`;
+};
+
+// "NeurIPS Datasets & Benchmarks 2022" swamps a tile bar; the short form is enough
+// at wall scale and the full venue is in the detail panel.
+const shortVenue = (venue: string) => venue.split(' ')[0];
+
+const venues = venueTally();
+const years = new Date().getFullYear() - profile.since.year;
+
+// Detail lives in a data island so the wall itself stays chrome-free.
+const details = Object.fromEntries(
+  publications.map((publication) => [
+    publication.slug,
+    {
+      title: publication.title,
+      venue: `${publication.venue} ${publication.year}`,
+      refereed: isPeerReviewed(publication),
+      role: authorRole(publication),
+      authors: publication.authors,
+      contribution: publication.contribution,
+      links: publication.links,
+    },
+  ]),
+);
 ---
 
 <BaseLayout>
-  <header class="topbar">
-    <a href="#top" class="wordmark">{profile.name}</a>
-    <nav aria-label="Site navigation">
-      <a href="#about">About</a>
-      <a href="#focus">Focus</a>
-      <a href="#work">Work</a>
-      <a href={`mailto:${profile.email}`}>Contact</a>
-      <ThemeToggle />
-    </nav>
-  </header>
+  <div class="wall-layout">
+    <aside class="rail" id="top">
+      <div class="rail__inner">
+        <div class="rail__head">
+          <p class="wordmark">{profile.name}</p>
+          <ThemeToggle />
+        </div>
+        <p class="eyebrow">{profile.role} · {profile.affiliation} · {profile.location}</p>
 
-  <main>
-    <Hero />
+        <p class="rail__lead">{profile.positioning.lead}</p>
+        <p class="rail__statement">{profile.positioning.statement}</p>
+        <p class="rail__bridge">{profile.bridge}</p>
 
-    <section class="section section--bio" id="about" aria-labelledby="about-heading">
-      <h2 class="section__label" id="about-heading">About</h2>
-      <p>{profile.biography}</p>
-    </section>
+        <ul class="rail__metrics" aria-label="Publication record">
+          {venues.map((venue) => <li>{venue.label}{venue.count > 1 && ` ×${venue.count}`}</li>)}
+          <li><a href={profile.github.repo}>{profile.github.label} ★{profile.github.stars.toLocaleString('en-US')}</a></li>
+          <li>{years} yrs @ {profile.since.label}</li>
+        </ul>
 
-    <section class="section" id="focus" aria-labelledby="focus-heading">
-      <h2 class="section__label" id="focus-heading">Current focus</h2>
-      <div class="focus-grid">
-        {profile.currentFocus.map((area, index) => <FocusCard {...area} index={index} />)}
-      </div>
-    </section>
+        <div class="link-row link-row--tight">
+          {profile.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}
+        </div>
 
-    <section class="section" id="work" aria-labelledby="work-heading">
-      <h2 class="section__label" id="work-heading">Selected work</h2>
-      <div class="work-grid">
-        {featuredWork.map((publication) => <PublicationCard publication={publication} />)}
-      </div>
-    </section>
-
-    <section class="section" id="earlier" aria-labelledby="earlier-heading">
-      <h2 class="section__label" id="earlier-heading">Earlier work</h2>
-      <ul class="pub-list">
-        {
-          otherPublications.map((publication) => (
+        <h2 class="rail__label">Now</h2>
+        <ul class="rail__now">
+          {now.map((publication) => (
             <li>
-              <span class="pill">{publication.venue} {publication.year}</span>
-              <div>
-                <p class="pub-list__title">{publication.title}</p>
-                <p class="pub-list__authors">{publication.authors}</p>
-              </div>
-              <div class="link-row link-row--tight">
-                {publication.links.map((link) => (
-                  <a class="chip chip--sm" href={link.href}>
-                    {link.label}
-                  </a>
-                ))}
-              </div>
+              <span>{stamp(publication.posted)}</span>
+              <a href={`#${publication.slug}`}>{publication.shortTitle}</a>
+              <em>{isPeerReviewed(publication) ? publication.venue : 'preprint'}</em>
             </li>
-          ))
-        }
-      </ul>
-    </section>
-  </main>
+          ))}
+        </ul>
+      </div>
+    </aside>
 
-  <footer class="footer">
-    <p>{profile.name} · {profile.affiliation} · {profile.location}</p>
-    <div class="link-row link-row--tight">
+    <main class="wall" aria-label="Results">
       {
-        profile.links.map((link) => (
-          <a class="chip chip--sm" href={link.href}>
-            {link.label}
-          </a>
+        wall.map((publication, index) => (
+          <button
+            class:list={['cell', index === 0 && 'cell--wide']}
+            type="button"
+            id={publication.slug}
+            data-slug={publication.slug}
+            aria-haspopup="dialog"
+          >
+            {publication.media.type === 'video' ? (
+              <video
+                src={publication.media.src}
+                poster={publication.media.poster}
+                playsinline
+                muted
+                loop
+                preload="none"
+                aria-hidden="true"
+                data-autoplay
+              />
+            ) : (
+              <img src={publication.media.src} alt="" loading="lazy" decoding="async" />
+            )}
+            <span class="cell__bar">
+              <span class:list={['pill', isPeerReviewed(publication) ? 'pill--refereed' : 'pill--preprint']}>
+                {shortVenue(publication.venue)} {publication.year}
+              </span>
+              <span class="cell__name">{publication.shortTitle}</span>
+            </span>
+          </button>
         ))
       }
+    </main>
+  </div>
+
+  <div class="detail" data-detail hidden>
+    <div class="detail__scrim" data-detail-close></div>
+    <div class="detail__panel" role="dialog" aria-modal="true" aria-labelledby="detail-title">
+      <button class="detail__close" type="button" data-detail-close aria-label="Close">×</button>
+      <div class="detail__meta">
+        <span class="pill" data-detail-venue></span>
+        <span class="role" data-detail-role></span>
+      </div>
+      <h3 id="detail-title" data-detail-title></h3>
+      <p class="detail__authors" data-detail-authors></p>
+      <p class="detail__contribution" data-detail-contribution></p>
+      <div class="link-row link-row--tight" data-detail-links></div>
     </div>
-  </footer>
+  </div>
+
+  <script is:inline type="application/json" data-detail-source set:html={JSON.stringify(details)} />
 </BaseLayout>
+
+<script is:inline>
+  (() => {
+    const source = document.querySelector('[data-detail-source]');
+    const panel = document.querySelector('[data-detail]');
+    if (!source || !panel) return;
+    const data = JSON.parse(source.textContent || '{}');
+
+    const el = (name) => panel.querySelector(`[data-detail-${name}]`);
+    const venue = el('venue');
+    const role = el('role');
+    const title = el('title');
+    const authors = el('authors');
+    const contribution = el('contribution');
+    const links = el('links');
+
+    const close = () => {
+      panel.hidden = true;
+      document.body.style.overflow = '';
+    };
+
+    const open = (slug) => {
+      const item = data[slug];
+      if (!item) return;
+      venue.textContent = item.venue;
+      venue.className = `pill ${item.refereed ? 'pill--refereed' : 'pill--preprint'}`;
+      role.textContent = item.role.label;
+      role.className = `role ${item.role.strong ? 'role--strong' : ''}`;
+      title.textContent = item.title;
+      authors.textContent = item.authors;
+      contribution.textContent = item.contribution;
+      links.replaceChildren(
+        ...item.links.map((link) => {
+          const a = document.createElement('a');
+          a.className = 'chip chip--sm';
+          a.href = link.href;
+          a.textContent = link.label;
+          return a;
+        }),
+      );
+      panel.hidden = false;
+      document.body.style.overflow = 'hidden';
+    };
+
+    document.querySelectorAll('.cell').forEach((cell) => {
+      cell.addEventListener('click', () => open(cell.dataset.slug));
+    });
+    panel.querySelectorAll('[data-detail-close]').forEach((node) => {
+      node.addEventListener('click', close);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !panel.hidden) close();
+    });
+  })();
+</script>
