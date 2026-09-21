@@ -1,0 +1,48 @@
+---
+import { AUTHOR_NAME, authorRole, isPeerReviewed, shortAuthors } from '../data/publications';
+import type { Publication } from '../data/publications';
+
+interface Props {
+  publication: Publication;
+}
+
+const { publication } = Astro.props;
+const role = authorRole(publication);
+const refereed = isPeerReviewed(publication);
+const thumb = publication.media.poster ?? publication.media.src;
+const authorParts = shortAuthors(publication.authors, 4).split(AUTHOR_NAME);
+const href = publication.links[0]?.href;
+---
+
+<li class="row" id={publication.slug} data-topics={publication.topics.join('|')}>
+  <img class="row__thumb" src={thumb} alt="" loading="lazy" decoding="async" width="128" height="80" />
+
+  <div class="row__venue">
+    <span class:list={['pill', refereed ? 'pill--refereed' : 'pill--preprint']}>
+      {publication.venue}
+    </span>
+    <span class="row__year">{publication.year}</span>
+  </div>
+
+  <div class="row__main">
+    <h3>{href ? <a href={href}>{publication.title}</a> : publication.title}</h3>
+    <p class="row__authors" title={publication.authors}>
+      {
+        authorParts.map((part, index) => (
+          <>
+            {index > 0 && <strong>{AUTHOR_NAME}</strong>}
+            {part}
+          </>
+        ))
+      }
+    </p>
+    <p class="row__contribution">{publication.contribution}</p>
+  </div>
+
+  <div class="row__side">
+    <span class:list={['role', role.strong && 'role--strong']}>{role.label}</span>
+    <div class="link-row link-row--tight">
+      {publication.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}
+    </div>
+  </div>
+</li>

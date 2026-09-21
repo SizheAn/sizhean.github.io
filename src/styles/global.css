@@ -617,3 +617,182 @@ h1 {
     align-items: flex-start;
   }
 }
+
+/* ---------- variant A: the dossier ---------- */
+
+.section--tight {
+  padding-bottom: 64px;
+}
+
+.section__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.section__bar .section__label {
+  flex: 1;
+  min-width: 140px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+}
+
+.filter {
+  padding: 4px 11px;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease, background 140ms ease;
+}
+
+.filter:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.filter.is-on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.filters__empty {
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.pub-table {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 128px 110px minmax(0, 1fr) 190px;
+  gap: 20px;
+  align-items: start;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.row[hidden] {
+  display: none;
+}
+
+.row__thumb {
+  width: 128px;
+  height: 80px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.row__venue {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: flex-start;
+}
+
+.row__year {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+}
+
+.row__main h3 {
+  margin: 0 0 5px;
+  font-size: 0.98rem;
+  line-height: 1.35;
+}
+
+.row__main h3 a:hover {
+  color: var(--accent);
+}
+
+.row__authors {
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.row__authors strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.row__contribution {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.row__side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+@media (max-width: 900px) {
+  .row {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .row__thumb {
+    width: 96px;
+    height: 60px;
+  }
+
+  .row__venue {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .row__main,
+  .row__side {
+    grid-column: 1 / -1;
+  }
+
+  .row__side {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+}
+
+/* Dossier compression: the whole page should land in ~2 screens. */
+.hero {
+  padding: 64px 0 56px;
+}
+
+.hero__marquee {
+  gap: 10px;
+}
+
+.section {
+  padding-bottom: 72px;
+}

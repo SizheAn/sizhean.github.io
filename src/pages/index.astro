@@ -2,19 +2,27 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import FocusCard from '../components/FocusCard.astro';
 import Hero from '../components/Hero.astro';
-import PublicationCard from '../components/PublicationCard.astro';
+import PubRow from '../components/PubRow.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import { profile } from '../data/profile';
-import { featuredWork, otherPublications } from '../data/publications';
+import { TOPICS, publications } from '../data/publications';
+
+// One reverse-chronological table, newest first — the order a reviewer expects
+// when they are doing retrieval rather than reading.
+const ordered = [...publications].sort(
+  (a, b) =>
+    Number(b.year) - Number(a.year) ||
+    (a.featuredOrder ?? 99) - (b.featuredOrder ?? 99),
+);
 ---
 
 <BaseLayout>
   <header class="topbar">
     <a href="#top" class="wordmark">{profile.name}</a>
     <nav aria-label="Site navigation">
-      <a href="#about">About</a>
       <a href="#focus">Focus</a>
-      <a href="#work">Work</a>
+      <a href="#work">Publications</a>
+      <a href="#about">About</a>
       <a href={`mailto:${profile.email}`}>Contact</a>
       <ThemeToggle />
     </nav>
@@ -23,12 +31,7 @@ import { featuredWork, otherPublications } from '../data/publications';
   <main>
     <Hero />
 
-    <section class="section section--bio" id="about" aria-labelledby="about-heading">
-      <h2 class="section__label" id="about-heading">About</h2>
-      <p>{profile.biography}</p>
-    </section>
-
-    <section class="section" id="focus" aria-labelledby="focus-heading">
+    <section class="section section--tight" id="focus" aria-labelledby="focus-heading">
       <h2 class="section__label" id="focus-heading">Current focus</h2>
       <div class="focus-grid">
         {profile.currentFocus.map((area, index) => <FocusCard {...area} index={index} />)}
@@ -36,34 +39,24 @@ import { featuredWork, otherPublications } from '../data/publications';
     </section>
 
     <section class="section" id="work" aria-labelledby="work-heading">
-      <h2 class="section__label" id="work-heading">Selected work</h2>
-      <div class="work-grid">
-        {featuredWork.map((publication) => <PublicationCard publication={publication} />)}
+      <div class="section__bar">
+        <h2 class="section__label" id="work-heading">Publications</h2>
+        <div class="filters" role="group" aria-label="Filter publications by topic">
+          <button class="filter is-on" type="button" data-topic="all">All</button>
+          {TOPICS.map((topic) => (
+            <button class="filter" type="button" data-topic={topic}>{topic}</button>
+          ))}
+        </div>
       </div>
+      <ul class="pub-table" data-pub-table>
+        {ordered.map((publication) => <PubRow publication={publication} />)}
+      </ul>
+      <p class="filters__empty" data-filter-empty hidden>No publications under this topic.</p>
     </section>
 
-    <section class="section" id="earlier" aria-labelledby="earlier-heading">
-      <h2 class="section__label" id="earlier-heading">Earlier work</h2>
-      <ul class="pub-list">
-        {
-          otherPublications.map((publication) => (
-            <li>
-              <span class="pill">{publication.venue} {publication.year}</span>
-              <div>
-                <p class="pub-list__title">{publication.title}</p>
-                <p class="pub-list__authors">{publication.authors}</p>
-              </div>
-              <div class="link-row link-row--tight">
-                {publication.links.map((link) => (
-                  <a class="chip chip--sm" href={link.href}>
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </li>
-          ))
-        }
-      </ul>
+    <section class="section section--bio" id="about" aria-labelledby="about-heading">
+      <h2 class="section__label" id="about-heading">About</h2>
+      <p>{profile.biography}</p>
     </section>
   </main>
 
@@ -80,3 +73,28 @@ import { featuredWork, otherPublications } from '../data/publications';
     </div>
   </footer>
 </BaseLayout>
+
+<script is:inline>
+  (() => {
+    const table = document.querySelector('[data-pub-table]');
+    const empty = document.querySelector('[data-filter-empty]');
+    const buttons = [...document.querySelectorAll('.filter')];
+    if (!table || !buttons.length) return;
+
+    buttons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const topic = button.dataset.topic;
+        buttons.forEach((other) => other.classList.toggle('is-on', other === button));
+
+        let shown = 0;
+        for (const row of table.children) {
+          const topics = (row.dataset.topics || '').split('|');
+          const match = topic === 'all' || topics.includes(topic);
+          row.hidden = !match;
+          if (match) shown += 1;
+        }
+        if (empty) empty.hidden = shown > 0;
+      });
+    });
+  })();
+</script>
