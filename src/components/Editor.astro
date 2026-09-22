@@ -1,0 +1,603 @@
+---
+import { profile } from '../data/profile';
+import { defaultRole, featuredWork, otherPublications, publications } from '../data/publications';
+
+const SECTIONS = [
+  { key: 'about', label: 'About' },
+  { key: 'focus', label: 'Current focus' },
+  { key: 'work', label: 'Selected work' },
+  { key: 'earlier', label: 'Earlier work' },
+];
+
+const featuredSlugs = new Set(featuredWork.map((publication) => publication.slug));
+
+// The shipped content, as the editor's starting point. Anything the user
+// changes is stored as a diff against this in localStorage.
+const baseline = {
+  version: 1,
+  profile: {
+    name: profile.name,
+    role: profile.role,
+    affiliation: profile.affiliation,
+    location: profile.location,
+    positioning: { ...profile.positioning },
+    biography: profile.biography,
+    scholarCount: profile.scholarBadge.count ?? null,
+  },
+  label: {
+    about: 'About',
+    focus: 'Current focus',
+    work: 'Selected work',
+    earlier: 'Earlier work',
+  },
+  section: Object.fromEntries(SECTIONS.map((section) => [section.key, true])),
+  focus: profile.currentFocus.map((area) => ({
+    label: area.label,
+    description: area.description,
+  })),
+  pub: Object.fromEntries(
+    publications.map((publication) => [
+      publication.slug,
+      {
+        title: publication.title,
+        venue: publication.venue,
+        year: publication.year,
+        authors: publication.authors,
+        contribution: publication.contribution,
+        role: defaultRole(publication),
+        featured: featuredSlugs.has(publication.slug),
+      },
+    ]),
+  ),
+  order: [...featuredWork, ...otherPublications].map((publication) => publication.slug),
+};
+
+// Full originals, so "Export data files" can regenerate complete, valid TS
+// rather than only the handful of fields the editor exposes.
+const sourceData = { profile, publications };
+---
+
+<div class="editor" data-editor hidden>
+  <div class="editor__head">
+    <strong>Edit mode</strong>
+    <label class="editor__switch">
+      <input type="checkbox" data-editing />
+      <span>Editing</span>
+    </label>
+    <button type="button" data-collapse title="Collapse">–</button>
+  </div>
+
+  <div class="editor__body" data-editor-body>
+    <p class="editor__hint">
+      Click any text on the page to change it. Everything is saved in this browser only.
+    </p>
+
+    <label class="editor__field">
+      <span>Scholar citations</span>
+      <input type="number" min="0" step="1" placeholder="hidden until set" data-scholar-input />
+    </label>
+
+    <fieldset class="editor__group">
+      <legend>Sections</legend>
+      {
+        SECTIONS.map((section) => (
+          <label class="editor__check">
+            <input type="checkbox" data-section-toggle={section.key} checked />
+            <span>{section.label}</span>
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <div class="editor__actions">
+      <button type="button" data-export-json>Export JSON</button>
+      <button type="button" data-export-ts>Export data files</button>
+      <button type="button" data-import>Import JSON</button>
+      <button type="button" data-reset class="editor__danger">Reset all</button>
+    </div>
+
+    <p class="editor__status" data-status role="status"></p>
+    <input type="file" accept="application/json,.json" data-import-input hidden />
+  </div>
+</div>
+
+<script is:inline type="application/json" data-baseline set:html={JSON.stringify(baseline)} />
+<script is:inline type="application/json" data-source set:html={JSON.stringify(sourceData)} />
+
+<script is:inline>
+  (() => {
+    const KEY = 'sizhean-homepage-edits-v1';
+    const AUTHOR = 'Sizhe An';
+
+    const readIsland = (selector) => {
+      const node = document.querySelector(selector);
+      return node ? JSON.parse(node.textContent || '{}') : {};
+    };
+
+    const baseline = readIsland('[data-baseline]');
+    const source = readIsland('[data-source]');
+    const editor = document.querySelector('[data-editor]');
+    if (!editor) return;
+
+    const clone = (value) => JSON.parse(JSON.stringify(value));
+
+    // Stored edits are a partial diff, so adding a field to the site later does
+    // not strand someone on an old snapshot that is missing it.
+    const mergeInto = (target, patch) => {
+      for (const [key, value] of Object.entries(patch || {})) {
+        if (value && typeof value === 'object' && !Array.isArray(value) && target[key]) {
+          mergeInto(target[key], value);
+        } else if (value !== undefined) {
+          target[key] = value;
+        }
+      }
+      return target;
+    };
+
+    let state = clone(baseline);
+    try {
+      const saved = localStorage.getItem(KEY);
+      if (saved) mergeInto(state, JSON.parse(saved));
+    } catch {
+      // Corrupt or blocked storage: fall back to the shipped content.
+    }
+    // A slug added to the site after the snapshot was saved still needs a slot.
+    for (const slug of baseline.order) {
+      if (!state.order.includes(slug)) state.order.push(slug);
+    }
+
+    const status = editor.querySelector('[data-status]');
+    let statusTimer;
+    const say = (message) => {
+      if (!status) return;
+      status.textContent = message;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => (status.textContent = ''), 2600);
+    };
+
+    const save = () => {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(state));
+      } catch {
+        say('Could not save — storage is blocked in this browser.');
+      }
+    };
+
+    const get = (path) =>
+      path.split('.').reduce((node, key) => (node == null ? undefined : node[key]), state);
+
+    const set = (path, value) => {
+      const keys = path.split('.');
+      const last = keys.pop();
+      const node = keys.reduce((acc, key) => (acc[key] = acc[key] || {}), state);
+      node[last] = value;
+    };
+
+    /** Author lists keep "Sizhe An" bold, so they cannot just take textContent. */
+    const renderAuthors = (el, text) => {
+      el.textContent = '';
+      const parts = String(text).split(AUTHOR);
+      parts.forEach((part, index) => {
+        if (index > 0) {
+          const strong = document.createElement('strong');
+          strong.textContent = AUTHOR;
+          el.append(strong);
+        }
+        el.append(document.createTextNode(part));
+      });
+    };
+
+    const STRONG_ROLE = /^(first|second|last) author$/i;
+
+    const applyText = () => {
+      for (const el of document.querySelectorAll('[data-edit]')) {
+        if (el === document.activeElement) continue;
+        const value = get(el.dataset.edit);
+        if (value === undefined || value === null) continue;
+        if (el.hasAttribute('data-authors')) renderAuthors(el, value);
+        else el.textContent = value;
+      }
+      for (const el of document.querySelectorAll('[data-role-for]')) {
+        const role = state.pub[el.dataset.roleFor]?.role || '';
+        el.classList.toggle('tile__role--strong', STRONG_ROLE.test(role.trim()));
+      }
+    };
+
+    const applyScholar = () => {
+      const badge = document.querySelector('[data-scholar]');
+      const count = state.profile.scholarCount;
+      if (!badge) return;
+      const has = count !== null && count !== '' && !Number.isNaN(Number(count));
+      badge.hidden = !has;
+      if (has) {
+        badge.querySelector('[data-scholar-count]').textContent =
+          Number(count).toLocaleString('en-US');
+      }
+    };
+
+    const applySections = () => {
+      for (const section of document.querySelectorAll('[data-section]')) {
+        section.hidden = state.section[section.dataset.section] === false;
+      }
+    };
+
+    const applyPublications = () => {
+      const grid = document.querySelector('[data-container="featured"]');
+      const list = document.querySelector('[data-container="earlier"]');
+      if (!grid || !list) return;
+
+      let featured = 0;
+      let earlier = 0;
+      for (const slug of state.order) {
+        const entry = state.pub[slug];
+        if (!entry) continue;
+        const tile = grid.querySelector(`[data-pub="${slug}"]`);
+        const row = list.querySelector(`[data-pub="${slug}"]`);
+        if (tile) {
+          tile.hidden = !entry.featured;
+          if (entry.featured) {
+            grid.append(tile);
+            featured += 1;
+          }
+        }
+        if (row) {
+          row.hidden = !!entry.featured;
+          if (!entry.featured) {
+            list.append(row);
+            earlier += 1;
+          }
+        }
+      }
+      const emptyFeatured = document.querySelector('[data-empty="featured"]');
+      const emptyEarlier = document.querySelector('[data-empty="earlier"]');
+      if (emptyFeatured) emptyFeatured.hidden = featured > 0;
+      if (emptyEarlier) emptyEarlier.hidden = earlier > 0;
+    };
+
+    const apply = () => {
+      applyText();
+      applyScholar();
+      applySections();
+      applyPublications();
+    };
+
+    // ---- edit mode ----
+
+    const wanted = /(^|[?&])edit=1(&|$)/.test(location.search) || location.hash === '#edit';
+    let editing = false;
+
+    const setEditing = (on) => {
+      editing = on;
+      document.body.classList.toggle('is-editing', on);
+      for (const el of document.querySelectorAll('[data-edit]')) {
+        if (!on) {
+          el.removeAttribute('contenteditable');
+          continue;
+        }
+        // plaintext-only keeps pasted markup out; older Firefox rejects the
+        // value outright, so fall back rather than leaving the field inert.
+        el.setAttribute('contenteditable', 'plaintext-only');
+        if (!el.isContentEditable) el.setAttribute('contenteditable', 'true');
+      }
+      for (const el of document.querySelectorAll('[data-controls]')) {
+        el.hidden = !on;
+      }
+    };
+
+    let saveTimer;
+    document.addEventListener('input', (event) => {
+      const el = event.target.closest?.('[data-edit]');
+      if (!el || !editing) return;
+      set(el.dataset.edit, el.textContent.trim());
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        save();
+        say('Saved');
+      }, 400);
+    });
+
+    document.addEventListener('blur', (event) => {
+      const el = event.target.closest?.('[data-edit]');
+      if (!el || !editing) return;
+      set(el.dataset.edit, el.textContent.trim());
+      save();
+      apply();
+    }, true);
+
+    // Enter should commit, not insert a newline into a heading.
+    document.addEventListener('keydown', (event) => {
+      if (!editing || event.key !== 'Enter') return;
+      const el = event.target.closest?.('[data-edit]');
+      if (!el) return;
+      event.preventDefault();
+      el.blur();
+    });
+
+    document.addEventListener('click', (event) => {
+      const button = event.target.closest?.('[data-move], [data-place-toggle]');
+      if (!button || !editing) return;
+      const host = button.closest('[data-pub]');
+      if (!host) return;
+      const slug = host.dataset.pub;
+      const entry = state.pub[slug];
+      if (!entry) return;
+
+      if (button.hasAttribute('data-place-toggle')) {
+        entry.featured = !entry.featured;
+      } else {
+        // Swap with the nearest neighbour in the same section, so a move inside
+        // Selected work never reshuffles Earlier work.
+        const dir = button.dataset.move === 'up' ? -1 : 1;
+        const index = state.order.indexOf(slug);
+        for (let i = index + dir; i >= 0 && i < state.order.length; i += dir) {
+          const other = state.order[i];
+          if (state.pub[other]?.featured === entry.featured) {
+            state.order[index] = other;
+            state.order[i] = slug;
+            break;
+          }
+        }
+      }
+      save();
+      apply();
+    });
+
+    // ---- panel ----
+
+    const editingBox = editor.querySelector('[data-editing]');
+    const scholarInput = editor.querySelector('[data-scholar-input]');
+    const body = editor.querySelector('[data-editor-body]');
+
+    editingBox.addEventListener('change', () => setEditing(editingBox.checked));
+    editor.querySelector('[data-collapse]').addEventListener('click', () => {
+      body.hidden = !body.hidden;
+    });
+
+    scholarInput.addEventListener('input', () => {
+      const raw = scholarInput.value.trim();
+      state.profile.scholarCount = raw === '' ? null : Number(raw);
+      applyScholar();
+      save();
+    });
+
+    for (const box of editor.querySelectorAll('[data-section-toggle]')) {
+      box.addEventListener('change', () => {
+        state.section[box.dataset.sectionToggle] = box.checked;
+        applySections();
+        save();
+      });
+    }
+
+    const download = (filename, text, type) => {
+      const url = URL.createObjectURL(new Blob([text], { type }));
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      anchor.click();
+      URL.revokeObjectURL(url);
+    };
+
+    editor.querySelector('[data-export-json]').addEventListener('click', () => {
+      download('homepage-content.json', JSON.stringify(state, null, 2), 'application/json');
+      say('Exported JSON');
+    });
+
+    editor.querySelector('[data-export-ts]').addEventListener('click', () => {
+      download('profile.ts', buildProfileTs(), 'text/plain');
+      download('publications.ts', buildPublicationsTs(), 'text/plain');
+      say('Exported profile.ts + publications.ts');
+    });
+
+    const importInput = editor.querySelector('[data-import-input]');
+    editor.querySelector('[data-import]').addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', () => {
+      const file = importInput.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(String(reader.result));
+          if (!parsed || typeof parsed !== 'object' || !parsed.version) {
+            throw new Error('not a homepage export');
+          }
+          state = mergeInto(clone(baseline), parsed);
+          for (const slug of baseline.order) {
+            if (!state.order.includes(slug)) state.order.push(slug);
+          }
+          save();
+          syncPanel();
+          apply();
+          say('Imported');
+        } catch (error) {
+          say(`Import failed — ${error.message}`);
+        }
+        importInput.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    editor.querySelector('[data-reset]').addEventListener('click', () => {
+      if (!confirm('Discard all your edits and go back to the published content?')) return;
+      localStorage.removeItem(KEY);
+      state = clone(baseline);
+      syncPanel();
+      apply();
+      say('Reset');
+    });
+
+    function syncPanel() {
+      scholarInput.value = state.profile.scholarCount ?? '';
+      for (const box of editor.querySelectorAll('[data-section-toggle]')) {
+        box.checked = state.section[box.dataset.sectionToggle] !== false;
+      }
+    }
+
+    // ---- data-file export ----
+
+    const q = (value) => JSON.stringify(value);
+
+    const derivedRole = (authors) => {
+      const names = String(authors).split(',').map((n) => n.trim()).filter(Boolean);
+      const index = names.indexOf(AUTHOR);
+      if (index === 0) return 'First author';
+      if (index === names.length - 1) return 'Last author';
+      if (index === 1) return 'Second author';
+      return `Author ${index + 1} of ${names.length}`;
+    };
+
+    function buildProfileTs() {
+      const p = clone(source.profile);
+      const edited = state.profile;
+      p.name = edited.name;
+      p.role = edited.role;
+      p.affiliation = edited.affiliation;
+      p.location = edited.location;
+      p.positioning = { ...p.positioning, ...edited.positioning };
+      p.biography = edited.biography;
+      p.currentFocus = state.focus.map((area, index) => ({
+        ...(source.profile.currentFocus[index] || {}),
+        ...area,
+      }));
+      p.scholarBadge = {
+        ...p.scholarBadge,
+        count: edited.scholarCount === null ? undefined : Number(edited.scholarCount),
+      };
+
+      const count = p.scholarBadge.count;
+      return [
+        '// Generated by the in-browser editor. Review before committing.',
+        '',
+        'export type ProfileLink = {',
+        '  label: string;',
+        '  href: string;',
+        '  pending?: boolean;',
+        '  note?: string;',
+        '};',
+        '',
+        'export type FocusArea = {',
+        '  label: string;',
+        '  description: string;',
+        '};',
+        '',
+        'export const profile = {',
+        `  name: ${q(p.name)},`,
+        `  role: ${q(p.role)},`,
+        `  affiliation: ${q(p.affiliation)},`,
+        `  location: ${q(p.location)},`,
+        `  email: ${q(p.email)},`,
+        `  portrait: ${q(p.portrait)},`,
+        `  portraitAlt: ${q(p.portraitAlt)},`,
+        `  oneLiner: ${q(p.oneLiner)},`,
+        '  positioning: {',
+        `    lead: ${q(p.positioning.lead)},`,
+        `    statement: ${q(p.positioning.statement)},`,
+        `    foundation: ${q(p.positioning.foundation)},`,
+        '  },',
+        `  links: ${JSON.stringify(p.links, null, 2).replace(/\n/g, '\n  ')} satisfies ProfileLink[],`,
+        '  scholarBadge: {',
+        `    label: ${q(p.scholarBadge.label)},`,
+        `    href: ${q(p.scholarBadge.href)},`,
+        `    count: ${count === undefined ? 'undefined as number | undefined' : count} as number | undefined,`,
+        '  },',
+        `  currentFocus: ${JSON.stringify(p.currentFocus, null, 2).replace(/\n/g, '\n  ')} satisfies FocusArea[],`,
+        `  biography: ${q(p.biography)},`,
+        '};',
+        '',
+      ].join('\n');
+    }
+
+    function buildPublicationsTs() {
+      const featuredOrder = state.order.filter((slug) => state.pub[slug]?.featured);
+      const entries = state.order
+        .map((slug) => {
+          const original = source.publications.find((item) => item.slug === slug);
+          if (!original) return null;
+          const edited = state.pub[slug];
+          const merged = {
+            ...original,
+            title: edited.title,
+            venue: edited.venue,
+            year: edited.year,
+            authors: edited.authors,
+            contribution: edited.contribution,
+          };
+          // Only persist a role that says something the default would not.
+          const role = (edited.role || '').trim();
+          if (role && role !== derivedRole(edited.authors)) merged.role = role;
+          else delete merged.role;
+
+          const position = featuredOrder.indexOf(slug);
+          if (position >= 0) merged.featuredOrder = position + 1;
+          else delete merged.featuredOrder;
+          return merged;
+        })
+        .filter(Boolean);
+
+      const indent = (text) => text.replace(/\n/g, '\n  ');
+      return [
+        '// Generated by the in-browser editor. Review before committing.',
+        '',
+        'export type Media = {',
+        "  type: 'image' | 'video';",
+        '  src: string;',
+        '  poster?: string;',
+        '  alt: string;',
+        '  source: string;',
+        "  fit?: 'cover' | 'contain';",
+        '};',
+        '',
+        'export type Publication = {',
+        '  slug: string;',
+        '  title: string;',
+        '  shortTitle: string;',
+        '  authors: string;',
+        '  venue: string;',
+        '  year: string;',
+        '  theme: string;',
+        '  summary: string;',
+        '  contribution: string;',
+        '  tags: string[];',
+        '  media: Media;',
+        '  links: Array<{ label: string; href: string }>;',
+        '  featuredOrder?: number;',
+        '  role?: string;',
+        '};',
+        '',
+        `export const publications: Publication[] = ${indent(JSON.stringify(entries, null, 2))};`,
+        '',
+        'export const featuredWork: Publication[] = publications',
+        '  .filter((publication) => publication.featuredOrder !== undefined)',
+        '  .sort((a, b) => a.featuredOrder! - b.featuredOrder!);',
+        '',
+        'export const otherPublications: Publication[] = publications.filter(',
+        '  (publication) => publication.featuredOrder === undefined,',
+        ');',
+        '',
+        "export const AUTHOR_NAME = 'Sizhe An';",
+        '',
+        'export function defaultRole(publication: Publication): string {',
+        '  if (publication.role) return publication.role;',
+        "  const names = publication.authors.split(',').map((name) => name.trim()).filter(Boolean);",
+        '  const index = names.indexOf(AUTHOR_NAME);',
+        "  if (index === 0) return 'First author';",
+        "  if (index === names.length - 1) return 'Last author';",
+        "  if (index === 1) return 'Second author';",
+        '  return `Author ${index + 1} of ${names.length}`;',
+        '}',
+        '',
+        'export const isStrongRole = (role: string) => /^(first|second|last) author$/i.test(role);',
+        '',
+      ].join('\n');
+    }
+
+    // ---- boot ----
+
+    apply();
+    if (wanted) {
+      editor.hidden = false;
+      syncPanel();
+      editingBox.checked = true;
+      setEditing(true);
+    }
+  })();
+</script>

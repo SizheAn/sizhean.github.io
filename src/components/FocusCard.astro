@@ -10,6 +10,6 @@ const { label, description, index } = Astro.props;
 
 <article class="focus-card">
   <span class="focus-card__index">{String(index + 1).padStart(2, '0')}</span>
-  <h3>{label}</h3>
-  <p>{description}</p>
+  <h3 data-edit={`focus.${index}.label`}>{label}</h3>
+  <p data-edit={`focus.${index}.description`}>{description}</p>
 </article>

@@ -33,6 +33,11 @@ export type Publication = {
   }>;
   /** Position in the Selected Work grid, ordered by embodiment proximity. */
   featuredOrder?: number;
+  /**
+   * Shown under the venue badge. Left unset, the page falls back to author
+   * position, which is a fact rather than a claim — see defaultRole.
+   */
+  role?: string;
 };
 
 export const publications: Publication[] = [
@@ -343,3 +348,23 @@ export const featuredWork: Publication[] = publications
 export const otherPublications: Publication[] = publications.filter(
   (publication) => publication.featuredOrder === undefined,
 );
+
+export const AUTHOR_NAME = 'Sizhe An';
+
+/**
+ * Author position is a fact; "Led" is a claim only Sizhe can make. The default
+ * states the position and stops there, so a reviewer counting names in the
+ * author list cannot catch the page out. Override it in the editor.
+ */
+export function defaultRole(publication: Publication): string {
+  if (publication.role) return publication.role;
+
+  const names = publication.authors.split(',').map((name) => name.trim()).filter(Boolean);
+  const index = names.indexOf(AUTHOR_NAME);
+  if (index === 0) return 'First author';
+  if (index === names.length - 1) return 'Last author';
+  if (index === 1) return 'Second author';
+  return `Author ${index + 1} of ${names.length}`;
+}
+
+export const isStrongRole = (role: string) => /^(first|second|last) author$/i.test(role);

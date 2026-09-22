@@ -1,0 +1,34 @@
+---
+import { defaultRole } from '../data/publications';
+import type { Publication } from '../data/publications';
+
+interface Props {
+  publication: Publication;
+  /** Rendered but hidden when the paper currently sits in Selected work. */
+  hidden?: boolean;
+}
+
+const { publication, hidden = false } = Astro.props;
+const { slug } = publication;
+const role = defaultRole(publication);
+---
+
+<li data-pub={slug} data-place="earlier" hidden={hidden}>
+  <span class="pill">
+    <span data-edit={`pub.${slug}.venue`}>{publication.venue}</span>
+    <span data-edit={`pub.${slug}.year`}>{publication.year}</span>
+  </span>
+  <div>
+    <p class="pub-list__title" data-edit={`pub.${slug}.title`}>{publication.title}</p>
+    <p class="pub-list__authors" data-edit={`pub.${slug}.authors`}>{publication.authors}</p>
+    <p class="pub-list__role" data-edit={`pub.${slug}.role`} data-role-for={slug}>{role}</p>
+  </div>
+  <div class="link-row link-row--tight">
+    {publication.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}
+    <span class="pub-controls pub-controls--inline" data-controls hidden>
+      <button type="button" data-move="up" title="Move up">↑</button>
+      <button type="button" data-move="down" title="Move down">↓</button>
+      <button type="button" data-place-toggle title="Move to Selected work">Feature</button>
+    </span>
+  </div>
+</li>

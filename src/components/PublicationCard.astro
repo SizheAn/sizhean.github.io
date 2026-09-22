@@ -1,19 +1,22 @@
 ---
-import { profile } from '../data/profile';
+import { AUTHOR_NAME, defaultRole, isStrongRole } from '../data/publications';
 import type { Publication } from '../data/publications';
 
 interface Props {
   publication: Publication;
+  /** Rendered but hidden when the paper currently sits in Earlier work. */
+  hidden?: boolean;
 }
 
-const { publication } = Astro.props;
-const { media } = publication;
+const { publication, hidden = false } = Astro.props;
+const { media, slug } = publication;
 const primaryHref = publication.links[0]?.href;
+const role = defaultRole(publication);
 // Split rather than string-replace so the author name is emphasized as markup.
-const authorParts = publication.authors.split(profile.name);
+const authorParts = publication.authors.split(AUTHOR_NAME);
 ---
 
-<article class="tile" id={publication.slug}>
+<article class="tile" id={slug} data-pub={slug} data-place="featured" hidden={hidden}>
   <div class:list={['tile__media', media.fit === 'contain' && 'tile__media--contain']}>
     {
       media.type === 'video' ? (
@@ -31,30 +34,50 @@ const authorParts = publication.authors.split(profile.name);
         <img src={media.src} alt={media.alt} loading="lazy" decoding="async" />
       )
     }
+    <div class="pub-controls" data-controls hidden>
+      <button type="button" data-move="up" title="Move up">↑</button>
+      <button type="button" data-move="down" title="Move down">↓</button>
+      <button type="button" data-place-toggle title="Move to Earlier work">Unfeature</button>
+    </div>
   </div>
 
   <div class="tile__body">
     <div class="tile__meta">
-      <span class="pill">{publication.venue} {publication.year}</span>
+      <span class="pill">
+        <span data-edit={`pub.${slug}.venue`}>{publication.venue}</span>
+        <span data-edit={`pub.${slug}.year`}>{publication.year}</span>
+      </span>
+      <span
+        class:list={['tile__role', isStrongRole(role) && 'tile__role--strong']}
+        data-edit={`pub.${slug}.role`}
+        data-role-for={slug}>{role}</span>
       <span class="tile__theme">{publication.theme}</span>
     </div>
 
     <h3>
-      {primaryHref ? <a href={primaryHref}>{publication.title}</a> : publication.title}
+      {
+        primaryHref ? (
+          <a href={primaryHref} data-edit={`pub.${slug}.title`}>{publication.title}</a>
+        ) : (
+          <span data-edit={`pub.${slug}.title`}>{publication.title}</span>
+        )
+      }
     </h3>
 
-    <p class="tile__authors">
+    <p class="tile__authors" data-edit={`pub.${slug}.authors`} data-authors>
       {
         authorParts.map((part, index) => (
           <>
-            {index > 0 && <strong>{profile.name}</strong>}
+            {index > 0 && <strong>{AUTHOR_NAME}</strong>}
             {part}
           </>
         ))
       }
     </p>
 
-    <p class="tile__contribution">{publication.contribution}</p>
+    <p class="tile__contribution" data-edit={`pub.${slug}.contribution`}>
+      {publication.contribution}
+    </p>
 
     <div class="link-row link-row--tight">
       {publication.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}

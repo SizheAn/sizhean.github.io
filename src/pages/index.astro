@@ -1,16 +1,25 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Editor from '../components/Editor.astro';
 import FocusCard from '../components/FocusCard.astro';
 import Hero from '../components/Hero.astro';
+import PubListRow from '../components/PubListRow.astro';
 import PublicationCard from '../components/PublicationCard.astro';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import { profile } from '../data/profile';
 import { featuredWork, otherPublications } from '../data/publications';
+
+// Every paper is rendered in BOTH places and the inactive copy ships `hidden`,
+// so the editor can move a paper between sections without building markup at
+// runtime — and a visitor without JS still sees the correct page.
+const featuredSlugs = new Set(featuredWork.map((publication) => publication.slug));
+const gridOrder = [...featuredWork, ...otherPublications];
+const listOrder = [...otherPublications, ...featuredWork];
 ---
 
 <BaseLayout>
   <header class="topbar">
-    <a href="#top" class="wordmark">{profile.name}</a>
+    <a href="#top" class="wordmark" data-edit="profile.name">{profile.name}</a>
     <nav aria-label="Site navigation">
       <a href="#about">About</a>
       <a href="#focus">Focus</a>
@@ -23,52 +32,52 @@ import { featuredWork, otherPublications } from '../data/publications';
   <main>
     <Hero />
 
-    <section class="section section--bio" id="about" aria-labelledby="about-heading">
-      <h2 class="section__label" id="about-heading">About</h2>
-      <p>{profile.biography}</p>
+    <section class="section section--bio" id="about" data-section="about" aria-labelledby="about-heading">
+      <h2 class="section__label" id="about-heading" data-edit="label.about">About</h2>
+      <p data-edit="profile.biography">{profile.biography}</p>
     </section>
 
-    <section class="section" id="focus" aria-labelledby="focus-heading">
-      <h2 class="section__label" id="focus-heading">Current focus</h2>
+    <section class="section" id="focus" data-section="focus" aria-labelledby="focus-heading">
+      <h2 class="section__label" id="focus-heading" data-edit="label.focus">Current focus</h2>
       <div class="focus-grid">
         {profile.currentFocus.map((area, index) => <FocusCard {...area} index={index} />)}
       </div>
     </section>
 
-    <section class="section" id="work" aria-labelledby="work-heading">
-      <h2 class="section__label" id="work-heading">Selected work</h2>
-      <div class="work-grid">
-        {featuredWork.map((publication) => <PublicationCard publication={publication} />)}
+    <section class="section" id="work" data-section="work" aria-labelledby="work-heading">
+      <h2 class="section__label" id="work-heading" data-edit="label.work">Selected work</h2>
+      <div class="work-grid" data-container="featured">
+        {
+          gridOrder.map((publication) => (
+            <PublicationCard
+              publication={publication}
+              hidden={!featuredSlugs.has(publication.slug)}
+            />
+          ))
+        }
       </div>
+      <p class="container-empty" data-empty="featured" hidden>Nothing featured yet.</p>
     </section>
 
-    <section class="section" id="earlier" aria-labelledby="earlier-heading">
-      <h2 class="section__label" id="earlier-heading">Earlier work</h2>
-      <ul class="pub-list">
+    <section class="section" id="earlier" data-section="earlier" aria-labelledby="earlier-heading">
+      <h2 class="section__label" id="earlier-heading" data-edit="label.earlier">Earlier work</h2>
+      <ul class="pub-list" data-container="earlier">
         {
-          otherPublications.map((publication) => (
-            <li>
-              <span class="pill">{publication.venue} {publication.year}</span>
-              <div>
-                <p class="pub-list__title">{publication.title}</p>
-                <p class="pub-list__authors">{publication.authors}</p>
-              </div>
-              <div class="link-row link-row--tight">
-                {publication.links.map((link) => (
-                  <a class="chip chip--sm" href={link.href}>
-                    {link.label}
-                  </a>
-                ))}
-              </div>
-            </li>
+          listOrder.map((publication) => (
+            <PubListRow publication={publication} hidden={featuredSlugs.has(publication.slug)} />
           ))
         }
       </ul>
+      <p class="container-empty" data-empty="earlier" hidden>Nothing here yet.</p>
     </section>
   </main>
 
   <footer class="footer">
-    <p>{profile.name} · {profile.affiliation} · {profile.location}</p>
+    <p>
+      <span data-edit="profile.name">{profile.name}</span> ·
+      <span data-edit="profile.affiliation">{profile.affiliation}</span> ·
+      <span data-edit="profile.location">{profile.location}</span>
+    </p>
     <div class="link-row link-row--tight">
       {
         profile.links
@@ -81,4 +90,6 @@ import { featuredWork, otherPublications } from '../data/publications';
       }
     </div>
   </footer>
+
+  <Editor />
 </BaseLayout>

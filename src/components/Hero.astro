@@ -6,11 +6,17 @@ const { positioning, scholarBadge } = profile;
 
 <section class="hero" id="top">
   <div class="hero__copy">
-    <p class="eyebrow">{profile.role} · {profile.affiliation} · {profile.location}</p>
-    <h1>{profile.name}</h1>
-    <p class="hero__lead">{positioning.lead}</p>
-    <p class="hero__statement">{positioning.statement}</p>
-    <p class="hero__foundation">{positioning.foundation}</p>
+    <p class="eyebrow">
+      <span data-edit="profile.role">{profile.role}</span> ·
+      <span data-edit="profile.affiliation">{profile.affiliation}</span> ·
+      <span data-edit="profile.location">{profile.location}</span>
+    </p>
+    <h1 data-edit="profile.name">{profile.name}</h1>
+    <p class="hero__lead" data-edit="profile.positioning.lead">{positioning.lead}</p>
+    <p class="hero__statement" data-edit="profile.positioning.statement">{positioning.statement}</p>
+    <p class="hero__foundation" data-edit="profile.positioning.foundation">
+      {positioning.foundation}
+    </p>
 
     <div class="link-row" aria-label="Profile links">
       {
@@ -29,14 +35,11 @@ const { positioning, scholarBadge } = profile;
       }
     </div>
 
-    {
-      scholarBadge.count !== undefined && (
-        <a class="scholar-badge" href={scholarBadge.href}>
-          <span>{scholarBadge.label}</span>
-          <strong>{scholarBadge.count.toLocaleString('en-US')}</strong>
-        </a>
-      )
-    }
+    {/* Always in the DOM so the editor can reveal it once a count is set. */}
+    <a class="scholar-badge" href={scholarBadge.href} data-scholar hidden={scholarBadge.count === undefined}>
+      <span>{scholarBadge.label}</span>
+      <strong data-scholar-count>{scholarBadge.count ?? ''}</strong>
+    </a>
   </div>
 
   <figure class="hero__portrait">
