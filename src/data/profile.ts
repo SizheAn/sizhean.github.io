@@ -10,12 +10,12 @@ export const profile = {
   name: 'Sizhe An',
   affiliation: 'Meta',
   location: 'Redmond, WA',
-  email: 'sizhe.an@wisc.edu',
+  email: 'sizhe.an@outlook.com',
   portrait: '/assets/profile.jpg',
   portraitAlt: 'Portrait of Sizhe An',
 
   /** The one line under the name. What the work is lives in `biography`, once. */
-  positioning: 'Embodied AI & robot learning',
+  positioning: 'Physical AI towards Human-level Dexterity',
 
   /** Meta/OG description: the biography's opening, standing on its own. */
   description:
@@ -33,7 +33,7 @@ export const profile = {
       pending: true,
       note: 'Drop cv.pdf into public/assets/ to activate.',
     },
-    { label: 'Email', href: 'mailto:sizhe.an@wisc.edu' },
+    { label: 'Email', href: 'mailto:sizhe.an@outlook.com' },
   ] satisfies ProfileLink[],
 
   /**
@@ -53,5 +53,5 @@ export const profile = {
    * Biostatistics & Medical Informatics), Reality Labs Research (Meta's RLR).
    */
   biography:
-    'I’m a research scientist at Meta Reality Labs Research, where I work on building robotic foundation models and scaling up egocentric data for human-level dexterity. My background is in multi-modal motion generation and 3D humans. I received my PhD from the University of Wisconsin–Madison, advised by Ümit Ogras and Yin Li, and my BS from the University of Electronic Science and Technology of China (UESTC).',
+    'I’m a research scientist at Meta Reality Labs Research, where I work on building robotic foundation models and scaling up egocentric data for human-level dexterity. I obtained my Ph.D. in Computer Engineering from University of Wisconsin-Madison in 2023, advised by Prof. Umit Y. Ogras and I also worked closely with Prof. Yin Li. Prior to that, I received my B.S. from UESTC in 2018.',
 };

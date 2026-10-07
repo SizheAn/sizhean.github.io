@@ -254,8 +254,9 @@ export const publications: Publication[] = [
       alt: 'PanoHead 360-degree full-head synthesis overview',
       source: 'Author-owned site asset: /images/panohead_overview-min.gif, re-encoded to mp4',
     },
+    // The project page named in the paper (arXiv comment); /panohead/ here is only a stub.
     links: [
-      { label: 'Project', href: '/panohead/' },
+      { label: 'Project', href: 'https://sizhean.github.io/panohead' },
       { label: 'Paper', href: 'https://arxiv.org/abs/2303.13071' },
       { label: 'Code', href: 'https://github.com/sizhean/panohead' },
     ],
@@ -309,8 +310,9 @@ export const publications: Publication[] = [
       alt: 'mRI multimodal 3D pose estimation across RGB, IMU and radar inputs',
       source: 'Author-owned site asset: /images/demo_gif_rotate.gif, re-encoded to mp4',
     },
+    // The project page named in the paper (arXiv comment); /mri/ here is only a stub.
     links: [
-      { label: 'Project', href: '/mri/' },
+      { label: 'Project', href: 'https://sizhean.github.io/mri' },
       { label: 'Paper', href: 'https://arxiv.org/abs/2210.08394' },
       { label: 'Code', href: 'https://github.com/sizhean/mri' },
     ],
