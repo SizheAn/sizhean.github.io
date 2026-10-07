@@ -4,14 +4,27 @@ import type { Publication } from '../data/publications';
 
 interface Props {
   publication: Publication;
+  /** Adds the editor's hooks: field keys, per-paper controls, an always-present lead mark. */
+  editable?: boolean;
+  /** Edit mode only: rendered but hidden while the paper sits in Earlier work. */
+  hidden?: boolean;
 }
 
-const { publication } = Astro.props;
-const { media } = publication;
+const { publication, editable = false, hidden = false } = Astro.props;
+const { media, slug } = publication;
 const primaryHref = publication.links[0]?.href;
+const hook = <T,>(value: T) => (editable ? value : undefined);
+// Edit-only elements are glued to the expression before them (`}{`): on a line
+// of their own they would leave a stray space in the public markup.
 ---
 
-<article class="tile" id={publication.slug}>
+<article
+  class="tile"
+  id={slug}
+  data-pub={hook(slug)}
+  data-place={hook('featured')}
+  hidden={(editable && hidden) || undefined}
+>
   <div class:list={['tile__media', media.fit === 'contain' && 'tile__media--contain']}>
     {
       media.type === 'video' ? (
@@ -28,23 +41,42 @@ const primaryHref = publication.links[0]?.href;
       ) : (
         <img src={media.src} alt={media.alt} loading="lazy" decoding="async" />
       )
+    }{
+      editable && (
+        <div class="pub-controls" data-controls hidden>
+          <button type="button" data-move="up" title="Move up">↑</button>
+          <button type="button" data-move="down" title="Move down">↓</button>
+          <button type="button" data-lead-toggle title="Toggle ★ Project lead">★ Lead</button>
+          <button type="button" data-place-toggle title="Move to Earlier work">Unfeature</button>
+        </div>
+      )
     }
   </div>
 
   <div class="tile__body">
     <div class="tile__meta">
-      <span class="pill">{publication.venue} {publication.year}</span>
-      {publication.projectLead && <span class="tile__lead">★ Project lead</span>}
+      {
+        editable ? (
+          <span class="pill"><span data-edit={`pub.${slug}.venue`}>{publication.venue}</span> <span data-edit={`pub.${slug}.year`}>{publication.year}</span></span>
+        ) : (
+          <span class="pill">{publication.venue} {publication.year}</span>
+        )
+      }
+      {
+        (editable || publication.projectLead) && (
+          <span class="tile__lead" data-lead-for={hook(slug)} hidden={!publication.projectLead || undefined}>★ Project lead</span>
+        )
+      }
       <span class="tile__theme">{publication.theme}</span>
     </div>
 
     <h3>
-      {primaryHref ? <a href={primaryHref}>{publication.title}</a> : publication.title}
+      {primaryHref ? <a href={primaryHref} data-edit={hook(`pub.${slug}.title`)}>{publication.title}</a> : publication.title}
     </h3>
 
-    <AuthorList authors={publication.authors} class="tile__authors" />
+    <AuthorList authors={publication.authors} class="tile__authors" edit={hook(`pub.${slug}.authors`)} />
 
-    <p class="tile__contribution">{publication.contribution}</p>
+    <p class="tile__contribution" data-edit={hook(`pub.${slug}.contribution`)}>{publication.contribution}</p>
 
     <div class="link-row link-row--tight">
       {publication.links.map((link) => <a class="chip chip--sm" href={link.href}>{link.label}</a>)}

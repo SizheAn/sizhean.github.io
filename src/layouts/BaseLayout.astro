@@ -5,11 +5,14 @@ import { profile } from '../data/profile';
 interface Props {
   title?: string;
   description?: string;
+  /** The in-browser editor page: kept out of search, and only usable with ?edit=1. */
+  editor?: boolean;
 }
 
 const {
   title = 'Sizhe An — Embodied AI & Robot Learning',
   description = profile.description,
+  editor = false,
 } = Astro.props;
 ---
 
@@ -29,6 +32,19 @@ const {
     <meta name="theme-color" content="#0a0b0d" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
+    {
+      editor && (
+        <>
+          <meta name="robots" content="noindex" />
+          <script is:inline>
+            // Edit mode is opt-in: without ?edit=1 this page hands over to the public home.
+            if (!/[?&]edit=1(&|$)/.test(location.search)) {
+              location.replace(new URL('../index.html', location.href).href + location.hash);
+            }
+          </script>
+        </>
+      )
+    }
     <script is:inline>
       // Runs before paint so a stored light preference doesn't flash dark first.
       try {

@@ -1,13 +1,19 @@
 ---
 import { profile } from '../data/profile';
 
+interface Props {
+  editable?: boolean;
+}
+
+const { editable = false } = Astro.props;
 const { scholarBadge } = profile;
+const hook = <T,>(value: T) => (editable ? value : undefined);
 ---
 
 <section class="hero" id="top">
   <div class="hero__copy">
     <h1>{profile.name}</h1>
-    <p class="hero__lead">{profile.positioning}</p>
+    <p class="hero__lead" data-edit={hook('profile.positioning')}>{profile.positioning}</p>
 
     <div class="link-row" aria-label="Profile links">
       {
@@ -27,10 +33,15 @@ const { scholarBadge } = profile;
     </div>
 
     {
-      scholarBadge.count !== undefined && (
-        <a class="scholar-badge" href={scholarBadge.href}>
+      (editable || scholarBadge.count !== undefined) && (
+        <a
+          class="scholar-badge"
+          href={scholarBadge.href}
+          data-scholar={hook('')}
+          hidden={scholarBadge.count === undefined || undefined}
+        >
           <span>{scholarBadge.label}</span>
-          <strong>{scholarBadge.count.toLocaleString('en-US')}</strong>
+          <strong data-scholar-count={hook('')}>{scholarBadge.count?.toLocaleString('en-US')}</strong>
         </a>
       )
     }

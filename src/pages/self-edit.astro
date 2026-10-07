@@ -1,0 +1,17 @@
+---
+// The in-browser editor: the homepage with editing hooks, at /self-edit/?edit=1.
+// It is a page of its own so the public index.html stays byte-identical to the
+// design it edits — catching ?edit=1 there would need a script on every visit.
+//
+// The name must sort after index.astro: Astro names the stylesheet all pages
+// share after the first page that imports it, so an "edit.astro" would rename
+// it and change the <link> in every public page.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Editor from '../components/Editor.astro';
+import Home from '../components/Home.astro';
+---
+
+<BaseLayout title="Editing — Sizhe An" editor>
+  <Home editable />
+  <Editor />
+</BaseLayout>

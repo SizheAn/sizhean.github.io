@@ -1,0 +1,818 @@
+---
+import profileSource from '../data/profile.ts?raw';
+import publicationsSource from '../data/publications.ts?raw';
+import { profile } from '../data/profile';
+import { featuredWork, otherPublications, publications } from '../data/publications';
+
+const SECTIONS = [
+  { key: 'about', label: 'About' },
+  { key: 'work', label: 'Selected work' },
+  { key: 'earlier', label: 'Earlier work' },
+] as const;
+
+const featuredSlugs = new Set(featuredWork.map((publication) => publication.slug));
+
+// The shipped content: the editor's starting point and what Reset returns to.
+// Only the difference from this is kept in localStorage, so fields the owner
+// never touched keep following the published site.
+const baseline = {
+  design: 'round-3',
+  version: 1,
+  profile: {
+    positioning: profile.positioning,
+    biography: profile.biography,
+    scholarCount: profile.scholarBadge.count ?? null,
+  },
+  section: { ...profile.sections },
+  pub: Object.fromEntries(
+    publications.map((publication) => [
+      publication.slug,
+      {
+        title: publication.title,
+        venue: publication.venue,
+        year: publication.year,
+        authors: publication.authors,
+        contribution: publication.contribution,
+        featured: featuredSlugs.has(publication.slug),
+        projectLead: Boolean(publication.projectLead),
+      },
+    ]),
+  ),
+  order: [...featuredWork, ...otherPublications].map((publication) => publication.slug),
+};
+
+// The data files exactly as committed. "Export data files" patches values into
+// this text rather than regenerating it, so every comment and provenance note
+// survives, and an export with no edits is byte-identical to the repo.
+const sources = { profile: profileSource, publications: publicationsSource };
+
+// JSON inside a <script> element must never contain "</script>".
+const island = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
+---
+
+<div class="editor" data-editor>
+  <div class="editor__head">
+    <strong>Edit mode</strong>
+    <label class="editor__switch" title="Off: see the page without outlines and controls">
+      <input type="checkbox" data-editing checked />
+      <span>Editing</span>
+    </label>
+    <button type="button" data-collapse aria-label="Collapse panel" aria-expanded="true">–</button>
+  </div>
+
+  <div class="editor__body" data-editor-body>
+    <p class="editor__hint">
+      Click outlined text to edit it; each paper has ↑&nbsp;↓, ★&nbsp;Lead and Feature buttons.
+      Saved in this browser only — untick Editing to preview.
+    </p>
+
+    <label class="editor__field">
+      <span>Scholar citations</span>
+      <input type="number" min="0" step="1" placeholder="not set" data-scholar-input />
+    </label>
+
+    <fieldset class="editor__group">
+      <legend>Show sections</legend>
+      {
+        SECTIONS.map((section) => (
+          <label class="editor__check">
+            <input type="checkbox" data-section-toggle={section.key} checked />
+            <span>{section.label}</span>
+          </label>
+        ))
+      }
+    </fieldset>
+
+    <div class="editor__actions">
+      <button type="button" data-export-ts>Export data files</button>
+      <button type="button" data-export-json>Export JSON</button>
+      <button type="button" data-import>Import JSON</button>
+      <button type="button" data-reset class="editor__danger">Reset all</button>
+    </div>
+
+    <p class="editor__status" data-status role="status"></p>
+    <input type="file" accept="application/json,.json" data-import-input hidden />
+  </div>
+</div>
+
+<script is:inline type="application/json" data-baseline set:html={island(baseline)} />
+<script is:inline type="application/json" data-sources set:html={island(sources)} />
+
+<style is:inline>
+  /* Edit page only, so none of this reaches the public stylesheet. The editor
+     toggles visibility with the hidden attribute, and several of the things it
+     hides carry a display rule from their class, which would otherwise win. */
+  [hidden] {
+    display: none !important;
+  }
+
+  /* Room to scroll the last rows of the page clear of the fixed panel; the
+     script keeps --editor-height in step with the panel. */
+  body {
+    padding-bottom: calc(var(--editor-height, 0px) + 24px);
+  }
+
+  .editor {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    width: 280px;
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    background: var(--surface);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.42);
+    font-size: 0.84rem;
+  }
+
+  .editor__head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .editor__head strong {
+    flex: 1;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .editor__switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+  }
+
+  .editor__head button {
+    width: 22px;
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+  }
+
+  .editor__body {
+    display: grid;
+    gap: 10px;
+    padding: 10px 12px 12px;
+  }
+
+  .editor__hint {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.76rem;
+    line-height: 1.42;
+  }
+
+  .editor__field {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .editor__field span,
+  .editor__group legend {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .editor input[type='number'] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--ink);
+    font: inherit;
+  }
+
+  .editor__group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+    margin: 0;
+    padding: 6px 10px 8px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .editor__group legend {
+    padding: 0 5px;
+  }
+
+  .editor__check {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.8rem;
+  }
+
+  .editor__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+
+  .editor__actions button {
+    padding: 7px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+
+  .editor__actions button:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .editor__actions .editor__danger:hover {
+    border-color: #e5484d;
+    color: #e5484d;
+  }
+
+  .editor__status {
+    min-height: 1em;
+    margin: 0;
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+  }
+
+  /* ---- what editing looks like on the page ---- */
+
+  .is-editing [data-edit] {
+    outline: 1px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+    outline-offset: 3px;
+    border-radius: 2px;
+    cursor: text;
+  }
+
+  .is-editing [data-edit]:hover {
+    outline-style: solid;
+    background: color-mix(in srgb, var(--accent) 9%, transparent);
+  }
+
+  .is-editing [data-edit]:focus {
+    outline: 2px solid var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .pub-controls {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 2;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .pub-controls--inline {
+    position: static;
+  }
+
+  .pub-controls button {
+    padding: 3px 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    cursor: pointer;
+  }
+
+  .pub-controls button:hover,
+  .pub-controls button[aria-pressed='true'] {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .container-empty {
+    margin: 8px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 720px) {
+    .editor {
+      right: 10px;
+      bottom: 10px;
+      left: 10px;
+      width: auto;
+    }
+  }
+</style>
+
+<script is:inline>
+  (() => {
+    const KEY = 'sizhean-homepage-v3-edits';
+    const AUTHOR = 'Sizhe An';
+
+    const editor = document.querySelector('[data-editor]');
+    if (!editor) return;
+
+    const read = (selector) => JSON.parse(document.querySelector(selector).textContent);
+    const baseline = read('[data-baseline]');
+    const sources = read('[data-sources]');
+    const clone = (value) => JSON.parse(JSON.stringify(value));
+    const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+    const mergeInto = (target, patch) => {
+      for (const [key, value] of Object.entries(patch || {})) {
+        if (value && typeof value === 'object' && !Array.isArray(value) && target[key]) {
+          mergeInto(target[key], value);
+        } else if (value !== undefined && key in target) {
+          target[key] = value;
+        }
+      }
+      return target;
+    };
+
+    /** Only what differs from the shipped content; arrays compare whole. */
+    const diff = (base, value) => {
+      if (Array.isArray(value) || value === null || typeof value !== 'object') {
+        return same(base, value) ? undefined : value;
+      }
+      const out = {};
+      for (const key of Object.keys(value)) {
+        const changed = diff(base?.[key], value[key]);
+        if (changed !== undefined) out[key] = changed;
+      }
+      return Object.keys(out).length ? out : undefined;
+    };
+
+    /** Every shipped paper exactly once, whatever an old save or an import says. */
+    const normalize = (next) => {
+      const known = baseline.order;
+      next.order = [...new Set((next.order || []).filter((slug) => known.includes(slug)))];
+      for (const slug of known) if (!next.order.includes(slug)) next.order.push(slug);
+      return next;
+    };
+
+    const fromPatch = (patch) => normalize(mergeInto(clone(baseline), patch));
+
+    let state;
+    try {
+      state = fromPatch(JSON.parse(localStorage.getItem(KEY) || '{}'));
+    } catch {
+      state = fromPatch({}); // Corrupt or blocked storage: start from the shipped content.
+    }
+
+    const status = editor.querySelector('[data-status]');
+    let statusTimer;
+    const say = (message) => {
+      status.textContent = message;
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => (status.textContent = ''), 3200);
+    };
+
+    const save = () => {
+      try {
+        localStorage.setItem(KEY, JSON.stringify(diff(baseline, state) || {}));
+      } catch {
+        say('Could not save — storage is blocked in this browser.');
+      }
+    };
+
+    const get = (path, from = state) =>
+      path.split('.').reduce((node, key) => (node == null ? undefined : node[key]), from);
+
+    const set = (path, value) => {
+      const keys = path.split('.');
+      const last = keys.pop();
+      keys.reduce((node, key) => node[key], state)[last] = value;
+    };
+
+    // ---- state -> page ----
+
+    /** Author lists keep "Sizhe An" bold, so they cannot just take textContent. */
+    const renderAuthors = (el, text) => {
+      el.textContent = '';
+      String(text)
+        .split(AUTHOR)
+        .forEach((part, index) => {
+          if (index > 0) {
+            const strong = document.createElement('strong');
+            strong.textContent = AUTHOR;
+            el.append(strong);
+          }
+          el.append(part);
+        });
+    };
+
+    const applyText = () => {
+      for (const el of document.querySelectorAll('[data-edit]')) {
+        if (el === document.activeElement) continue;
+        const value = get(el.dataset.edit);
+        if (typeof value !== 'string') continue;
+        if (el.hasAttribute('data-authors')) renderAuthors(el, value);
+        else if (el.textContent !== value) el.textContent = value;
+      }
+    };
+
+    const applyLead = () => {
+      for (const mark of document.querySelectorAll('[data-lead-for]')) {
+        mark.hidden = !state.pub[mark.dataset.leadFor]?.projectLead;
+      }
+      for (const button of document.querySelectorAll('[data-lead-toggle]')) {
+        const on = !!state.pub[button.closest('[data-pub]').dataset.pub]?.projectLead;
+        button.setAttribute('aria-pressed', String(on));
+        button.textContent = on ? '★ Lead' : '☆ Lead';
+      }
+    };
+
+    const applyScholar = () => {
+      const badge = document.querySelector('[data-scholar]');
+      const count = state.profile.scholarCount;
+      const has = typeof count === 'number' && Number.isFinite(count);
+      badge.hidden = !has;
+      badge.querySelector('[data-scholar-count]').textContent = has
+        ? count.toLocaleString('en-US')
+        : '';
+    };
+
+    const applySections = () => {
+      for (const el of document.querySelectorAll('[data-section]')) {
+        el.hidden = state.section[el.dataset.section] === false;
+      }
+      for (const el of document.querySelectorAll('[data-nav-for]')) {
+        el.hidden = state.section[el.dataset.navFor] === false;
+      }
+    };
+
+    const applyPublications = () => {
+      const grid = document.querySelector('[data-container="featured"]');
+      const list = document.querySelector('[data-container="earlier"]');
+      let featured = 0;
+      let earlier = 0;
+      // Both copies of every paper follow state.order, hidden or not, so the
+      // DOM is a pure function of the state rather than of the edit history.
+      for (const slug of state.order) {
+        const entry = state.pub[slug];
+        const tile = grid.querySelector(`[data-pub="${slug}"]`);
+        const row = list.querySelector(`[data-pub="${slug}"]`);
+        tile.hidden = !entry.featured;
+        row.hidden = entry.featured;
+        grid.append(tile);
+        list.append(row);
+        if (entry.featured) featured += 1;
+        else earlier += 1;
+      }
+      document.querySelector('[data-empty="featured"]').hidden = featured > 0;
+      document.querySelector('[data-empty="earlier"]').hidden = earlier > 0;
+    };
+
+    const apply = () => {
+      applyText();
+      applyLead();
+      applyScholar();
+      applySections();
+      applyPublications();
+    };
+
+    // ---- editing on the page ----
+
+    let editing = false;
+
+    const setEditing = (on) => {
+      editing = on;
+      document.body.classList.toggle('is-editing', on);
+      for (const el of document.querySelectorAll('[data-edit]')) {
+        if (!on) {
+          el.removeAttribute('contenteditable');
+          continue;
+        }
+        // plaintext-only keeps pasted markup out; browsers that reject the
+        // value get "true" rather than an inert field.
+        el.setAttribute('contenteditable', 'plaintext-only');
+        if (!el.isContentEditable) el.setAttribute('contenteditable', 'true');
+      }
+      for (const el of document.querySelectorAll('[data-controls]')) el.hidden = !on;
+    };
+
+    const fieldOf = (target) => (editing ? target.closest?.('[data-edit]') : null);
+    const clean = (text) => text.replace(/\s+/g, ' ').trim();
+
+    let saveTimer;
+    document.addEventListener('input', (event) => {
+      const el = fieldOf(event.target);
+      if (!el) return;
+      set(el.dataset.edit, clean(el.textContent));
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        save();
+        say('Saved');
+      }, 400);
+    });
+
+    document.addEventListener(
+      'blur',
+      (event) => {
+        const el = fieldOf(event.target);
+        if (!el) return;
+        let value = clean(el.textContent);
+        if (!value) {
+          value = get(el.dataset.edit, baseline);
+          say('Empty field — restored the published text.');
+        }
+        set(el.dataset.edit, value);
+        save();
+        apply();
+      },
+      true,
+    );
+
+    // Enter commits; none of these fields hold more than one line.
+    document.addEventListener('keydown', (event) => {
+      const el = fieldOf(event.target);
+      if (!el || event.key !== 'Enter') return;
+      event.preventDefault();
+      el.blur();
+    });
+
+    // plaintext-only already pastes plain text; the "true" fallback would paste
+    // markup, so it gets the clipboard's text inserted by hand.
+    document.addEventListener('paste', (event) => {
+      const el = fieldOf(event.target);
+      const selection = getSelection();
+      if (!el || el.getAttribute('contenteditable') !== 'true' || !selection?.rangeCount) return;
+      event.preventDefault();
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(event.clipboardData?.getData('text/plain') || ''));
+      range.collapse(false);
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+
+    document.addEventListener('click', (event) => {
+      if (!editing) return;
+      // An editable title is a link; clicking it should place the caret.
+      if (event.target.closest?.('a[data-edit]')) event.preventDefault();
+
+      const button = event.target.closest?.('[data-move], [data-place-toggle], [data-lead-toggle]');
+      if (!button) return;
+      const slug = button.closest('[data-pub]').dataset.pub;
+      const entry = state.pub[slug];
+
+      if (button.hasAttribute('data-place-toggle')) {
+        entry.featured = !entry.featured;
+      } else if (button.hasAttribute('data-lead-toggle')) {
+        entry.projectLead = !entry.projectLead;
+      } else {
+        // Swap with the nearest neighbour in the same section, so a move inside
+        // Selected work never reshuffles Earlier work.
+        const step = button.dataset.move === 'up' ? -1 : 1;
+        const index = state.order.indexOf(slug);
+        for (let i = index + step; i >= 0 && i < state.order.length; i += step) {
+          const other = state.order[i];
+          if (state.pub[other].featured === entry.featured) {
+            state.order[index] = other;
+            state.order[i] = slug;
+            break;
+          }
+        }
+      }
+      save();
+      apply();
+    });
+
+    // ---- panel ----
+
+    const editingBox = editor.querySelector('[data-editing]');
+    const scholarInput = editor.querySelector('[data-scholar-input]');
+    const body = editor.querySelector('[data-editor-body]');
+    const sectionBoxes = editor.querySelectorAll('[data-section-toggle]');
+
+    const collapseButton = editor.querySelector('[data-collapse]');
+    const setCollapsed = (collapsed) => {
+      body.hidden = collapsed;
+      collapseButton.textContent = collapsed ? '+' : '–';
+      collapseButton.setAttribute('aria-expanded', String(!collapsed));
+      collapseButton.setAttribute('aria-label', collapsed ? 'Expand panel' : 'Collapse panel');
+    };
+
+    editingBox.addEventListener('change', () => setEditing(editingBox.checked));
+    collapseButton.addEventListener('click', () => setCollapsed(!body.hidden));
+    // On a phone the open panel would cover half the page; start it folded.
+    setCollapsed(matchMedia('(max-width: 720px)').matches);
+    new ResizeObserver(() => {
+      document.body.style.setProperty('--editor-height', `${editor.offsetHeight}px`);
+    }).observe(editor);
+
+    scholarInput.addEventListener('input', () => {
+      const raw = scholarInput.value.trim();
+      const count = Number(raw);
+      state.profile.scholarCount = raw === '' || !Number.isFinite(count) ? null : Math.max(0, Math.round(count));
+      applyScholar();
+      save();
+    });
+
+    for (const box of sectionBoxes) {
+      box.addEventListener('change', () => {
+        state.section[box.dataset.sectionToggle] = box.checked;
+        applySections();
+        save();
+      });
+    }
+
+    const syncPanel = () => {
+      scholarInput.value = state.profile.scholarCount ?? '';
+      for (const box of sectionBoxes) box.checked = state.section[box.dataset.sectionToggle] !== false;
+    };
+
+    const download = (filename, text, type) => {
+      const url = URL.createObjectURL(new Blob([text], { type }));
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.append(anchor); // Firefox ignores clicks on a detached link
+      anchor.click();
+      anchor.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    editor.querySelector('[data-export-ts]').addEventListener('click', () => {
+      try {
+        const files = [
+          ['profile.ts', exportProfile()],
+          ['publications.ts', exportPublications()],
+        ];
+        files.forEach(([name, text], index) =>
+          setTimeout(() => download(name, text, 'text/plain'), index * 300),
+        );
+        say('Exported profile.ts + publications.ts');
+      } catch (error) {
+        say(`Export failed — ${error.message}`);
+      }
+    });
+
+    editor.querySelector('[data-export-json]').addEventListener('click', () => {
+      download('homepage-content.json', `${JSON.stringify(state, null, 2)}\n`, 'application/json');
+      say('Exported JSON');
+    });
+
+    const importInput = editor.querySelector('[data-import-input]');
+    editor.querySelector('[data-import]').addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', async () => {
+      const file = importInput.files?.[0];
+      importInput.value = '';
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        if (parsed?.design !== baseline.design || !parsed.version) {
+          throw new Error('not an export from this editor');
+        }
+        state = fromPatch(parsed);
+        save();
+        syncPanel();
+        apply();
+        say('Imported');
+      } catch (error) {
+        say(`Import failed — ${error.message}`);
+      }
+    });
+
+    editor.querySelector('[data-reset]').addEventListener('click', () => {
+      if (!confirm('Discard all your edits and go back to the published content?')) return;
+      try {
+        localStorage.removeItem(KEY);
+      } catch {}
+      state = fromPatch({});
+      syncPanel();
+      apply();
+      say('Reset');
+    });
+
+    // ---- data-file export: patch values into the committed source text ----
+
+    const LITERAL = String.raw`'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"`;
+    const quote = (value) => `'${String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
+
+    /** Replaces the string literal after `key:` (it may sit on the next line). */
+    const patchLiteral = (text, indent, key, value) => {
+      const pattern = new RegExp(`^(${indent}${key}:\\s*)(?:${LITERAL})`, 'm');
+      if (!pattern.test(text)) throw new Error(`no ${key} in the source`);
+      return text.replace(pattern, (_match, head) => head + quote(value));
+    };
+
+    const replaceLine = (text, pattern, line) => {
+      if (!pattern.test(text)) throw new Error(`no match for ${pattern}`);
+      return text.replace(pattern, () => line);
+    };
+
+    function exportProfile() {
+      const edited = state.profile;
+      const shipped = baseline.profile;
+      let text = sources.profile;
+      if (edited.positioning !== shipped.positioning) {
+        text = patchLiteral(text, '  ', 'positioning', edited.positioning);
+      }
+      if (edited.biography !== shipped.biography) {
+        text = patchLiteral(text, '  ', 'biography', edited.biography);
+      }
+      if (edited.scholarCount !== shipped.scholarCount) {
+        const count = edited.scholarCount ?? 'undefined';
+        text = replaceLine(text, /^    count: .* as number \| undefined,$/m, `    count: ${count} as number | undefined,`);
+      }
+      if (!same(state.section, baseline.section)) {
+        const { about, work, earlier } = state.section;
+        text = replaceLine(text, /^  sections: \{.*\},$/m, `  sections: { about: ${about}, work: ${work}, earlier: ${earlier} },`);
+      }
+      return text;
+    }
+
+    function exportPublications() {
+      const lines = sources.publications.split('\n');
+      const open = lines.indexOf('export const publications: Publication[] = [');
+      const close = lines.indexOf('];', open);
+      if (open < 0 || close < 0) throw new Error('publications array not found');
+
+      // Entries are the top-level `  {` … `  },` blocks; anything between two
+      // entries (a comment, a blank line) travels with the entry after it.
+      const entries = [];
+      let pending = [];
+      let current = null;
+      for (const line of lines.slice(open + 1, close)) {
+        if (!current && line === '  {') current = [...pending, line];
+        else if (current) current.push(line);
+        else pending.push(line);
+        if (current && line === '  },') {
+          entries.push(current.join('\n'));
+          pending = [];
+          current = null;
+        }
+      }
+      if (current) throw new Error('unterminated publication entry');
+
+      const featuredOrder = state.order.filter((slug) => state.pub[slug].featured);
+      const bySlug = new Map();
+      for (const text of entries) {
+        const slug = text.match(/^    slug: '([^']+)',$/m)?.[1];
+        if (!slug) throw new Error('publication without a slug');
+        bySlug.set(slug, patchEntry(text, slug, featuredOrder));
+      }
+
+      const ordered = [
+        ...state.order.filter((slug) => bySlug.has(slug)),
+        ...[...bySlug.keys()].filter((slug) => !state.order.includes(slug)),
+      ].map((slug) => bySlug.get(slug));
+
+      return [...lines.slice(0, open + 1), ...ordered, ...pending, ...lines.slice(close)].join('\n');
+    }
+
+    function patchEntry(text, slug, featuredOrder) {
+      const edited = state.pub[slug];
+      const shipped = baseline.pub[slug];
+      if (!edited || !shipped) return text;
+
+      for (const key of ['title', 'authors', 'venue', 'year', 'contribution']) {
+        if (edited[key] !== shipped[key]) text = patchLiteral(text, '    ', key, edited[key]);
+      }
+
+      const insert = (line, before) => {
+        const anchor = before && text.match(new RegExp(`^${before}`, 'm'));
+        return anchor
+          ? text.replace(new RegExp(`^${before}`, 'm'), (match) => `${line}\n${match}`)
+          : text.replace(/\n {2}\},$/, `\n${line}\n  },`);
+      };
+
+      const position = featuredOrder.indexOf(slug) + 1 || null;
+      const current = Number(text.match(/^    featuredOrder: (\d+),$/m)?.[1]) || null;
+      if (position !== current) {
+        if (current && position) {
+          text = text.replace(/^    featuredOrder: \d+,$/m, `    featuredOrder: ${position},`);
+        } else if (current) {
+          text = text.replace(/^    featuredOrder: \d+,\n/m, '');
+        } else {
+          text = insert(`    featuredOrder: ${position},`, '    projectLead:');
+        }
+      }
+
+      const isLead = /^    projectLead: true,$/m.test(text);
+      if (edited.projectLead && !isLead) text = insert('    projectLead: true,');
+      if (!edited.projectLead && isLead) text = text.replace(/^    projectLead: true,\n/m, '');
+      return text;
+    }
+
+    // ---- boot ----
+
+    apply();
+    syncPanel();
+    setEditing(true);
+  })();
+</script>

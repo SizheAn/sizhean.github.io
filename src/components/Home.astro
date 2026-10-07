@@ -1,0 +1,125 @@
+---
+import Hero from './Hero.astro';
+import PubListRow from './PubListRow.astro';
+import PublicationCard from './PublicationCard.astro';
+import ThemeToggle from './ThemeToggle.astro';
+import { profile } from '../data/profile';
+import { featuredWork, otherPublications } from '../data/publications';
+
+interface Props {
+  /**
+   * Adds the in-browser editor's hooks. Off, the markup is exactly the public
+   * page; on, every paper is rendered in both sections with the inactive copy
+   * hidden, so the editor moves a paper by unhiding its other copy.
+   */
+  editable?: boolean;
+}
+
+const { editable = false } = Astro.props;
+const { sections } = profile;
+const hook = <T,>(value: T) => (editable ? value : undefined);
+
+const grid = editable ? [...featuredWork, ...otherPublications] : featuredWork;
+const list = editable ? [...otherPublications, ...featuredWork] : otherPublications;
+const featuredSlugs = new Set(featuredWork.map((publication) => publication.slug));
+// Edit-only elements are glued to the tag before them (`</div>{`): on a line of
+// their own they would leave a stray space in the public markup.
+---
+
+<header class="topbar">
+  <a href="#top" class="wordmark">{profile.name}</a>
+  <nav aria-label="Site navigation">
+    {
+      (editable || sections.about) && (
+        <a href="#about" data-nav-for={hook('about')} hidden={!sections.about || undefined}>About</a>
+      )
+    }
+    {
+      (editable || sections.work) && (
+        <a href="#work" data-nav-for={hook('work')} hidden={!sections.work || undefined}>Work</a>
+      )
+    }
+    <a href={`mailto:${profile.email}`}>Contact</a>
+    <ThemeToggle />
+  </nav>
+</header>
+
+<main>
+  <Hero editable={editable} />
+
+  {
+    (editable || sections.about) && (
+      <section
+        class="section section--bio"
+        id="about"
+        aria-labelledby="about-heading"
+        data-section={hook('about')}
+        hidden={!sections.about || undefined}
+      >
+        <h2 class="section__label" id="about-heading">About</h2>
+        <p data-edit={hook('profile.biography')}>{profile.biography}</p>
+      </section>
+    )
+  }
+
+  {
+    (editable || sections.work) && (
+      <section
+        class="section"
+        id="work"
+        aria-labelledby="work-heading"
+        data-section={hook('work')}
+        hidden={!sections.work || undefined}
+      >
+        <h2 class="section__label" id="work-heading">Selected work</h2>
+        <div class="work-grid" data-container={hook('featured')}>
+          {grid.map((publication) => (
+            <PublicationCard
+              publication={publication}
+              editable={editable}
+              hidden={!featuredSlugs.has(publication.slug)}
+            />
+          ))}
+        </div>{editable && <p class="container-empty" data-empty="featured" hidden>Nothing featured.</p>}
+      </section>
+    )
+  }
+
+  {
+    (editable || sections.earlier) && (
+      <section
+        class="section"
+        id="earlier"
+        aria-labelledby="earlier-heading"
+        data-section={hook('earlier')}
+        hidden={!sections.earlier || undefined}
+      >
+        <h2 class="section__label" id="earlier-heading">Earlier work</h2>
+        <ul class="pub-list" data-container={hook('earlier')}>
+          {list.map((publication) => (
+            <PubListRow
+              publication={publication}
+              editable={editable}
+              hidden={featuredSlugs.has(publication.slug)}
+            />
+          ))}
+        </ul>{editable && <p class="container-empty" data-empty="earlier" hidden>Nothing here.</p>}
+      </section>
+    )
+  }
+</main>
+
+<footer class="footer">
+  <p>{profile.name} · {profile.affiliation} · {profile.location}</p>
+  <div class="link-row link-row--tight">
+    {
+      profile.links
+        .filter((link) => !link.pending)
+        .map((link) => (
+          <a class="chip chip--sm" href={link.href}>
+            {link.label}
+          </a>
+        ))
+    }
+  </div>
+</footer>

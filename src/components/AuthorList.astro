@@ -4,14 +4,16 @@ import { profile } from '../data/profile';
 interface Props {
   authors: string;
   class: string;
+  /** Editor field key; the editor re-bolds the name after every edit. */
+  edit?: string;
 }
 
-const { authors, class: className } = Astro.props;
+const { authors, class: className, edit } = Astro.props;
 // Split rather than string-replace so the author name is emphasized as markup.
 const parts = authors.split(profile.name);
 ---
 
-<p class={className}>
+<p class={className} data-edit={edit} data-authors={edit && ''}>
   {
     parts.map((part, index) => (
       <>

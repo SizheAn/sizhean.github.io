@@ -54,4 +54,7 @@ export const profile = {
    */
   biography:
     'I’m a research scientist at Meta Reality Labs Research, where I work on building robotic foundation models and scaling up egocentric data for human-level dexterity. My background is in multi-modal motion generation and 3D humans. I received my PhD from the University of Wisconsin–Madison, advised by Ümit Ogras and Yin Li, and my BS from the University of Electronic Science and Technology of China (UESTC).',
+
+  /** Which homepage sections render. The in-browser editor can switch them off. */
+  sections: { about: true, work: true, earlier: true },
 };
