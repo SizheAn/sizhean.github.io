@@ -126,7 +126,9 @@ export const publications: Publication[] = [
     title: 'UMO: Unified In-Context Learning Unlocks Motion Foundation Model Priors',
     authors:
       'Xiaoyan Cong, Zekun Li, Zhiyang Dou, Hongyu Li, Omid Taheri, Chuan Guo, Abhay Mittal, Sizhe An, Taku Komura, Wojciech Matusik, Michael J. Black, Srinath Sridhar',
-    venue: 'arXiv',
+    // ECCV per the project page and co-authors Zhiyang Dou's and Chuan Guo's
+    // publication lists (2026-10-07). arXiv v1 predates the acceptance.
+    venue: 'ECCV',
     year: '2026',
     theme: 'In-context motion priors',
     summary:
