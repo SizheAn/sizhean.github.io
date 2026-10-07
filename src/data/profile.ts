@@ -6,31 +6,20 @@ export type ProfileLink = {
   note?: string;
 };
 
-export type FocusArea = {
-  label: string;
-  description: string;
-};
-
 export const profile = {
   name: 'Sizhe An',
-  role: 'Research Scientist',
   affiliation: 'Meta',
   location: 'Redmond, WA',
   email: 'sizhe.an@wisc.edu',
   portrait: '/assets/profile.jpg',
   portraitAlt: 'Portrait of Sizhe An',
 
-  /** Full positioning line, verbatim. Used for <title>/meta/OG copy. */
-  oneLiner:
-    'Embodied AI & robot learning — VLA, world-action models, dexterous manipulation, powered by large-scale robotics data & infra. Built on a foundation of multi-modal motion generation and 3D humans.',
+  /** The one line under the name. What the work is lives in `biography`, once. */
+  positioning: 'Embodied AI & robot learning',
 
-  /** Same sentence, split so the hero can give it typographic hierarchy. */
-  positioning: {
-    lead: 'Embodied AI & robot learning',
-    statement:
-      'VLA, world-action models, dexterous manipulation, powered by large-scale robotics data & infra.',
-    foundation: 'Built on a foundation of multi-modal motion generation and 3D humans.',
-  },
+  /** Meta/OG description: the biography's opening, standing on its own. */
+  description:
+    'Research scientist at Meta Reality Labs Research, working on building robotic foundation models and scaling up egocentric data for human-level dexterity.',
 
   links: [
     {
@@ -58,27 +47,11 @@ export const profile = {
   },
 
   /**
-   * Public-level research directions only. No internal project names, data
-   * volumes, or infrastructure specifics.
+   * Public-level description only: no internal project names, data volumes, or
+   * infrastructure specifics. Names checked 2026-10-07: Ümit Y. Ogras (ORCID
+   * 0000-0002-5045-5535; ACM keeps the Ü, IEEE drops it), Yin Li (UW–Madison
+   * Biostatistics & Medical Informatics), Reality Labs Research (Meta's RLR).
    */
-  currentFocus: [
-    {
-      label: 'Robotics data pipeline & infrastructure',
-      description:
-        'Collecting, curating, and serving robot-learning data at scale — teleoperation, human video, simulation — so heterogeneous demonstrations become something a policy can train on.',
-    },
-    {
-      label: 'VLA & world-action models',
-      description:
-        'Vision-language-action policies that read an instruction and a scene and emit control, paired with world models that predict what a body does next, so perception, prediction, and action share one representation.',
-    },
-    {
-      label: 'Dexterous manipulation',
-      description:
-        'Multi-fingered hands: contact-rich grasping, in-hand reorientation, and retargeting human hand motion onto robot hardware without losing the dexterity that made the demonstration useful.',
-    },
-  ] satisfies FocusArea[],
-
   biography:
-    'Research scientist at Meta in Redmond, working on embodied AI and robot learning. Ph.D. in Computer Engineering from the University of Wisconsin-Madison (2023), advised by Prof. Umit Y. Ogras and working closely with Prof. Yin Li; B.S. from the University of Electronic Science and Technology of China. Earlier work spans multi-modal motion generation, 3D human and head synthesis, and sensor-grounded pose estimation.',
+    'I’m a research scientist at Meta Reality Labs Research, where I work on building robotic foundation models and scaling up egocentric data for human-level dexterity. My background is in multi-modal motion generation and 3D humans. I received my PhD from the University of Wisconsin–Madison, advised by Ümit Ogras and Yin Li, and my BS from the University of Electronic Science and Technology of China (UESTC).',
 };

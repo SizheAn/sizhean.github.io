@@ -1,5 +1,5 @@
 ---
-import { profile } from '../data/profile';
+import AuthorList from './AuthorList.astro';
 import type { Publication } from '../data/publications';
 
 interface Props {
@@ -9,8 +9,6 @@ interface Props {
 const { publication } = Astro.props;
 const { media } = publication;
 const primaryHref = publication.links[0]?.href;
-// Split rather than string-replace so the author name is emphasized as markup.
-const authorParts = publication.authors.split(profile.name);
 ---
 
 <article class="tile" id={publication.slug}>
@@ -36,6 +34,7 @@ const authorParts = publication.authors.split(profile.name);
   <div class="tile__body">
     <div class="tile__meta">
       <span class="pill">{publication.venue} {publication.year}</span>
+      {publication.projectLead && <span class="tile__lead">★ Project lead</span>}
       <span class="tile__theme">{publication.theme}</span>
     </div>
 
@@ -43,16 +42,7 @@ const authorParts = publication.authors.split(profile.name);
       {primaryHref ? <a href={primaryHref}>{publication.title}</a> : publication.title}
     </h3>
 
-    <p class="tile__authors">
-      {
-        authorParts.map((part, index) => (
-          <>
-            {index > 0 && <strong>{profile.name}</strong>}
-            {part}
-          </>
-        ))
-      }
-    </p>
+    <AuthorList authors={publication.authors} class="tile__authors" />
 
     <p class="tile__contribution">{publication.contribution}</p>
 

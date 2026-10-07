@@ -1,0 +1,23 @@
+---
+import { profile } from '../data/profile';
+
+interface Props {
+  authors: string;
+  class: string;
+}
+
+const { authors, class: className } = Astro.props;
+// Split rather than string-replace so the author name is emphasized as markup.
+const parts = authors.split(profile.name);
+---
+
+<p class={className}>
+  {
+    parts.map((part, index) => (
+      <>
+        {index > 0 && <strong>{profile.name}</strong>}
+        {part}
+      </>
+    ))
+  }
+</p>

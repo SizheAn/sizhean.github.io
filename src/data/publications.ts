@@ -33,6 +33,11 @@ export type Publication = {
   }>;
   /** Position in the Selected Work grid, ordered by embodiment proximity. */
   featuredOrder?: number;
+  /**
+   * The page's only role marker, on Sizhe's say-so. Author position is never
+   * spelled out — the bolded name in the author list already shows it.
+   */
+  projectLead?: boolean;
 };
 
 export const publications: Publication[] = [
@@ -113,6 +118,7 @@ export const publications: Publication[] = [
     },
     links: [{ label: 'Paper', href: 'https://arxiv.org/abs/2607.20940' }],
     featuredOrder: 3,
+    projectLead: true,
   },
   {
     slug: 'umo',
@@ -168,6 +174,7 @@ export const publications: Publication[] = [
       { label: 'Paper', href: 'https://arxiv.org/abs/2604.25164' },
     ],
     featuredOrder: 5,
+    projectLead: true,
   },
   {
     slug: 'llamo',
